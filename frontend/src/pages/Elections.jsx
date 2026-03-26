@@ -6,8 +6,8 @@ const Elections = () => {
     return (
         <div className='flex flex-col gap-10'>
             <div className='flex flex-col items-center w-full'>
-                <h1 className='varela-font text-5xl pt-6 pb-4 font-extrabold'>3 Easy Steps to Election Excellence</h1>
-                <p className='text-orange-400 text-xl font-semibold  pb-4 inter-font'>How Elections Work in ElectionBuddy</p>
+                <h1 className='inter-font text-[32px] pt-6 pb-2 font-semibold text-[#262D34]'>3 Easy Steps to Election Excellence</h1>
+                <p className='text-[16px] text-orange-400 pb-4 inter-font font-bold'>How Elections Work in ElectionBuddy</p>
             </div>
             <div className='flex flex-row justify-between max-w-[60%]'>
                 <div className='flex flex-col'>
@@ -20,8 +20,8 @@ const Elections = () => {
                 </div>
             </div>
             <div className='flex flex-col mb-20'>
-                <p className='ml-30 inter-font text-xl text-gray-500 py-4'>Next Step</p>
-                <NavLink className='inter-font font-bold text-xxl ml-30 bg-orange-400 text-white rounded-sm w-60 px-4 py-3 hover:bg-[#22063A]'>Explore Service Options</NavLink>
+                <p className='ml-30 inter-font text-[16px] text-[#262D3A] font-semibold py-4'>Next Step</p>
+                <NavLink className='w-60 px-7 py-3 text-white font-semibold text-md inter-font rounded-md flex justify-center bg-[#00263A] hover:bg-[#001a28] transition ml-30'>Explore Service Options</NavLink>
             </div>
         </div>
     )

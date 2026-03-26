@@ -58,10 +58,10 @@ const CreateElection = () => {
         <div className='flex items-center justify-center px-4 py-10 bg-[#FAFAFA] min-h-[80vh]'>
             <div className='w-full max-w-xl bg-white border border-gray-200 px-10 py-8'>
 
-                <h1 className='varela-font text-3xl font-extrabold text-[#00263A] mb-1'>
+                <h1 className='inter-font text-[32px] font-semibold text-[#262D34] mb-1'>
                     Create New Election
                 </h1>
-                <p className='inter-font text-gray-500 text-sm mb-8'>
+                <p className='text-[16px] text-[#262D3A] mb-6.25'>
                     Fill in the details below to set up your election
                 </p>
 
@@ -75,11 +75,11 @@ const CreateElection = () => {
 
                     {/* Title */}
                     <div className='flex flex-col gap-1.5'>
-                        <label className='inter-font text-sm font-semibold text-[#262D3A]'>
+                        <label className='text-[16px] text-[#262D3A] mb-1 inter-font font-semibold'>
                             Election Name <span className='text-[#F28A36]'>*</span>
                         </label>
                         <input
-                            className='w-full px-4 py-3 bg-[#F3F7FE] outline-none inter-font text-[#00263A] placeholder-gray-400 border-2 border-transparent focus:border-[#F28A36] focus:bg-white transition-colors duration-200'
+                            className='w-full px-4 py-3 bg-[#F3F7FE] outline-none'
                             type='text'
                             name='title'
                             value={form.title}
@@ -91,11 +91,11 @@ const CreateElection = () => {
 
                     {/* Description */}
                     <div className='flex flex-col gap-1.5'>
-                        <label className='inter-font text-sm font-semibold text-[#262D3A]'>
+                        <label className='text-[16px] text-[#262D3A] mb-1 inter-font font-semibold'>
                             Description <span className='text-gray-400 font-normal'>(optional)</span>
                         </label>
                         <textarea
-                            className='w-full px-4 py-3 bg-[#F3F7FE] outline-none inter-font text-[#00263A] placeholder-gray-400 border-2 border-transparent focus:border-[#F28A36] focus:bg-white transition-colors duration-200 resize-none'
+                            className='w-full px-4 py-3 bg-[#F3F7FE] outline-none resize-none'
                             name='description'
                             rows={3}
                             value={form.description}
@@ -106,7 +106,7 @@ const CreateElection = () => {
 
                     {/* Type */}
                     <div className='flex flex-col gap-1.5'>
-                        <label className='inter-font text-sm font-semibold text-[#262D3A]'>
+                        <label className='text-[16px] text-[#262D3A] mb-1 inter-font font-semibold'>
                             Election Type <span className='text-[#F28A36]'>*</span>
                         </label>
                         <div className='flex gap-3'>
@@ -137,11 +137,11 @@ const CreateElection = () => {
                     {/* Dates */}
                     <div className='grid grid-cols-2 gap-4'>
                         <div className='flex flex-col gap-1.5'>
-                            <label className='inter-font text-sm font-semibold text-[#262D3A]'>
+                            <label className='text-[16px] text-[#262D3A] mb-1 inter-font font-semibold'>
                                 Start Date <span className='text-[#F28A36]'>*</span>
                             </label>
                             <input
-                                className='w-full px-4 py-3 bg-[#F3F7FE] outline-none inter-font text-[#00263A] border-2 border-transparent focus:border-[#F28A36] focus:bg-white transition-colors duration-200'
+                                className='w-full px-4 py-3 bg-[#F3F7FE] outline-none'
                                 type='datetime-local'
                                 name='startDate'
                                 value={form.startDate}
@@ -150,11 +150,11 @@ const CreateElection = () => {
                             />
                         </div>
                         <div className='flex flex-col gap-1.5'>
-                            <label className='inter-font text-sm font-semibold text-[#262D3A]'>
+                            <label className='text-[16px] text-[#262D3A] mb-1 inter-font font-semibold'>
                                 End Date <span className='text-[#F28A36]'>*</span>
                             </label>
                             <input
-                                className='w-full px-4 py-3 bg-[#F3F7FE] outline-none inter-font text-[#00263A] border-2 border-transparent focus:border-[#F28A36] focus:bg-white transition-colors duration-200'
+                                className='w-full px-4 py-3 bg-[#F3F7FE] outline-none'
                                 type='datetime-local'
                                 name='endDate'
                                 value={form.endDate}
@@ -166,7 +166,7 @@ const CreateElection = () => {
 
                     {/* Status */}
                     <div className='flex flex-col gap-1.5'>
-                        <label className='inter-font text-sm font-semibold text-[#262D3A]'>
+                        <label className='text-[16px] text-[#262D3A] mb-1 inter-font font-semibold'>
                             Save as
                         </label>
                         <div className='flex gap-3'>
@@ -201,13 +201,14 @@ const CreateElection = () => {
                         <button
                             type='button'
                             onClick={() => navigate('/dashboard')}
-                            className='flex-1 px-6 py-3 border-2 border-gray-200 text-gray-500 inter-font font-semibold hover:border-[#00263A] hover:text-[#00263A] transition duration-300'>
+                            className='w-[50%] px-7 py-3 text-[#262D3A] bg-gray-200 font-semibold text-md inter-font my-2 rounded-md flex items-center justify-center gap-2 cursor-pointer hover:bg-gray-300 transition'>
                             Cancel
                         </button>
                         <button
                             type='submit'
                             disabled={loading}
-                            className='flex-1 px-6 py-3 bg-[#00263A] text-white inter-font font-semibold hover:bg-[#F28A36] transition duration-300 disabled:opacity-50'>
+                            className={`w-[50%] px-7 py-3 text-white font-semibold text-md inter-font my-2 rounded-md flex items-center justify-center gap-2
+                            ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-[#00263A] cursor-pointer hover:bg-[#001a28] transition"}`}>
                             {loading ? 'Creating...' : 'Create Election'}
                         </button>
                     </div>
