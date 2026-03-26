@@ -7,12 +7,15 @@ const Login = () => {
     const navigate = useNavigate()
     const { login } = useAuth()
     const [form, setForm] = useState({ email: '', password: '' })
+    const [error, setError] = useState('');
     const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value })
-    }
+        setForm({ ...form, [e.target.name]: e.target.value });
+        setError(''); // clears error while typing
+    };
 
     const onSubmitHandler = async (e) => {
         e.preventDefault()
+        setError('');
         try {
             const res = await fetch('http://localhost:4000/api/auth/login', {
                 method: 'POST',
@@ -21,13 +24,13 @@ const Login = () => {
             })
             const data = await res.json()
             if (!res.ok) {
-                alert(data.message)
+                setError("Invalid email or password");
                 return;
             }
             login(data.user, data.token)
             navigate("/dashboard")
         } catch (error) {
-            console.log("Server Error")
+            setError("Server not reachable. Please try again.");
         }
     }
 
@@ -49,6 +52,11 @@ const Login = () => {
                         <input className='w-full px-4 py-3 bg-[#F3F7FE] outline-none' type="password" name='password'
                             value={form.password} required onChange={handleChange} placeholder='Password' />
                     </div>
+                    {error && (
+                        <p className="text-red-700 text-xl text-center">
+                            {error}
+                        </p>
+                    )}
                     <div className='flex justify-center mt-2'>
                         <button type='submit' className='w-[70%] px-7 py-3 bg-[#00263A] 
                         text-center text-white font-semibold text-md inter-font my-2 cursor-pointer'>Login</button>

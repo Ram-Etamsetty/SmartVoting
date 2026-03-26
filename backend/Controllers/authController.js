@@ -1,29 +1,36 @@
 const User = require('../Models/User')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-
+const { encryptDescriptor } = require('../utils/faceCrypto');
 const register = async (req, res) => {
-    const { name, email, password, jobTitle } = req.body
+    const { name, email, password, jobTitle, faceDescriptor } = req.body;
     try {
         // Check duplicate
-        const existing = await User.findOne({ email })
-        if (existing) {
-            return res.status(400).json({ message: 'Email Already Exists' })
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({
+                message: "User already exists"
+            });
         }
-
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&]).{6,}$/;
+        if (!passwordRegex.test(password)) {
+            return res.status(400).json({
+                message: "Password must be at least 6 characters and include letters, numbers, and a special character"
+            });
+        }
         // Hash password before saving
         const salt = await bcrypt.genSalt(10)
         const hashedPassword = await bcrypt.hash(password, salt)
-
+        const encryptedDescriptor = faceDescriptor ? encryptDescriptor(faceDescriptor) : null;
         // Save to MongoDB
-        const user = await User.create({ name, email, password: hashedPassword, jobTitle })
+        const user = await User.create({ name, email, password: hashedPassword, jobTitle,faceDescriptor: encryptedDescriptor || null })
 
         // Generate JWT token
         const token = jwt.sign({ id: user._id }, 'secret123', { expiresIn: '7d' })
 
         res.status(201).json({
             token,
-            user: { id: user._id, name: user.name, email: user.email, jobTitle: user.jobTitle }
+            user: { id: user._id, name: user.name, email: user.email, jobTitle: user.jobTitle,faceDescriptor: faceDescriptor || null }
         })
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message })
