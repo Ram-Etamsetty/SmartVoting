@@ -8,7 +8,7 @@ import { ButtonSpinner } from "../components/Spinners";
 import * as faceapi from "face-api.js";
 import { useRef, useEffect } from "react";
 
-const GetStarted = () => {
+const VoterRegister = () => {
   const navigate = useNavigate();
   const { error: showError, success } = useToast();
   const { login } = useAuth();
@@ -48,19 +48,10 @@ const GetStarted = () => {
       const MODEL_URL = "/models";
 
       try {
-        console.log("Loading models...");
-
         await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
-        console.log("TinyFaceDetector loaded");
-
         await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
-        console.log("Landmarks loaded");
-
         await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
-        console.log("Recognition loaded");
-
         setModelsLoaded(true);
-        console.log("ALL MODELS LOADED ✅");
       } catch (error) {
         console.error("Model loading failed ❌", error);
         setFaceError("Failed to load face detection models");
@@ -72,13 +63,10 @@ const GetStarted = () => {
 
   const startVideo = async () => {
     try {
-      // stop previous stream first
       if (videoRef.current && videoRef.current.srcObject) {
         videoRef.current.srcObject.getTracks().forEach((track) => track.stop());
       }
-
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         videoRef.current.onloadedmetadata = () => {
@@ -105,7 +93,6 @@ const GetStarted = () => {
     ctx.drawImage(videoRef.current, 0, 0);
     const image = canvas.toDataURL("image/png");
     setCapturedImage(image);
-    // OPTIONAL: pause video for cleaner UX
     videoRef.current.pause();
   };
 
@@ -125,7 +112,6 @@ const GetStarted = () => {
       setFaceError("");
 
       const img = await faceapi.fetchImage(capturedImage);
-
       const detection = await faceapi
         .detectSingleFace(
           img,
@@ -144,10 +130,7 @@ const GetStarted = () => {
         return;
       }
 
-      // ✅ success
       setFaceDescriptor(Array.from(detection.descriptor));
-
-      // close instantly
       setShowCamera(false);
       setCapturedImage(null);
       stopVideo();
@@ -175,6 +158,7 @@ const GetStarted = () => {
       setLoading(false);
       return;
     }
+    
     try {
       const res = await fetch("http://localhost:4000/api/auth/register", {
         method: "POST",
@@ -182,6 +166,7 @@ const GetStarted = () => {
         body: JSON.stringify({
           ...form,
           faceDescriptor,
+          role: "voter" // Inject voter role
         }),
       });
 
@@ -195,12 +180,11 @@ const GetStarted = () => {
 
       if (data.alreadyVerified) {
         success(data.message);
-        navigate("/login", { replace: true });
+        navigate("/voter-login", { replace: true });
         return;
       }
 
-      // Show OTP modal instead of immediately logging in
-      success("Registration successful! Check your email for OTP.");
+      success("Voter registration successful! Check your email for OTP.");
       setUserEmail(form.email);
       setShowOTPModal(true);
       setLoading(false);
@@ -210,27 +194,25 @@ const GetStarted = () => {
     }
   };
 
-  // Handle OTP verification success
   const handleOTPVerify = (userData) => {
-    // userData contains token and user info
     login(userData.user, userData.token);
     setShowOTPModal(false);
-    navigate("/dashboard", { replace: true });
+    navigate("/voter-dashboard", { replace: true });
   };
 
   return (
     <div className="flex items-center justify-center px-4 py-2">
-      <div className=" w-125 flex flex-col gap-2 px-4 py-2">
+      <div className="w-[500px] flex flex-col gap-2 px-4 py-2">
         <h1 className="inter-font text-[32px] font-semibold text-[#262D34]">
-          Administrator Sign Up
+          Voter Sign Up
         </h1>
         <p className="text-[16px] text-[#262D3A] mb-6.25">
-          Already have an account ?{" "}
+          Already have a Voter account ?{" "}
           <a
             className="text-orange-400 underline text-sm font-bold"
-            href="/login"
+            href="/voter-login"
           >
-            Login
+            Log In
           </a>
         </p>
         <form
@@ -295,12 +277,10 @@ const GetStarted = () => {
             />
           </div>
           <div className="flex flex-col items-center gap-3 mt-6">
-            {/* Section Title */}
             <p className="text-[15px] font-semibold text-gray-700">
-              Identity Verification
+              Voter Identity Verification
             </p>
 
-            {/* Capture Button */}
             <button
               type="button"
               onClick={() => setShowCamera(true)}
@@ -315,7 +295,6 @@ const GetStarted = () => {
               {modelsLoaded ? "Capture Face" : "Loading..."}
             </button>
 
-            {/* Success Message */}
             {faceDescriptor && (
               <div className="flex items-center gap-2 text-green-600 text-sm">
                 ✓ Face verified successfully
@@ -331,7 +310,7 @@ const GetStarted = () => {
                             ${loading || !faceDescriptor ? "bg-gray-400 cursor-not-allowed" : "bg-[#00263A] cursor-pointer hover:bg-[#001a28] transition"}`}
             >
               {loading && <ButtonSpinner size="sm" />}
-              {loading ? "Signing Up..." : "Sign-Up"}
+              {loading ? "Registering..." : "Sign-Up"}
             </button>
           </div>
         </form>
@@ -345,7 +324,6 @@ const GetStarted = () => {
                 </p>
               </div>
               
-              {/* Camera / Preview */}
               <div className="w-full h-[320px] bg-[#F8F9FA] rounded-xl overflow-hidden flex items-center justify-center border border-gray-200 shadow-inner">
                 {!modelsLoaded && !capturedImage ? (
                   <div className="flex flex-col items-center gap-3">
@@ -359,7 +337,6 @@ const GetStarted = () => {
                 )}
               </div>
 
-              {/* Buttons */}
               {!capturedImage ? (
                 <button
                   type="button"
@@ -436,4 +413,4 @@ const GetStarted = () => {
   );
 };
 
-export default GetStarted;
+export default VoterRegister;

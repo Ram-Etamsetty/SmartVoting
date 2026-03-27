@@ -4,7 +4,7 @@ import { useAuth } from "../Context/AuthContext";
 import { useToast } from "../Context/ToastContext";
 import { ButtonSpinner } from "../components/Spinners";
 
-const Login = () => {
+const VoterLogin = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   const { error: showError, success } = useToast();
@@ -22,7 +22,7 @@ const Login = () => {
       const res = await fetch("http://localhost:4000/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, role: "voter" }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -30,9 +30,9 @@ const Login = () => {
         setLoading(false);
         return;
       }
-      success("Login successful!");
+      success("Voter login successful!");
       login(data.user, data.token);
-      navigate("/dashboard", { replace: true });
+      navigate("/voter-dashboard", { replace: true });
     } catch (error) {
       showError("Server connection failed. Please try again.");
       setLoading(false);
@@ -41,15 +41,15 @@ const Login = () => {
 
   return (
     <div className="flex items-center justify-center px-4 py-2">
-      <div className="flex flex-col gap-2 px-4 py-2 w-125">
+      <div className="flex flex-col gap-2 px-4 py-2 w-[500px]">
         <div>
           <h1 className="inter-font text-[32px] font-semibold text-[#262D34]">
-            Administrator Login
+            Voter Login
           </h1>
           <p className="text-[16px] text-[#262D3A] mb-6.25">
-            To Cast Your Vote, Visit{" "}
-            <a className="text-orange-400 underline text-sm font-bold" href="/voter-login">
-              Voting Page
+            To create an election instead, Visit{" "}
+            <a className="text-orange-400 underline text-sm font-bold" href="/login">
+              Administrator Platform
             </a>
           </p>
         </div>
@@ -93,16 +93,16 @@ const Login = () => {
                             ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-[#00263A] cursor-pointer hover:bg-[#001a28] transition"}`}
             >
               {loading && <ButtonSpinner size="sm" />}
-              {loading ? "Logging In..." : "Login"}
+              {loading ? "Logging In..." : "Login to Vote"}
             </button>
           </div>
           <div className="flex items-center justify-center px-7 py-3 ">
             <p className="px-1">Don't Have Account ?</p>
             <a
               className="text-orange-400 underline text-md font-normal hover:text-orange-500"
-              href="/get-started"
+              href="/voter-register"
             >
-              SignUp
+              Voter Sign Up
             </a>
           </div>
         </form>
@@ -111,4 +111,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default VoterLogin;

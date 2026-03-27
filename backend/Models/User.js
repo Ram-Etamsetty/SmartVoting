@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema(
     isEmailVerified: { type: Boolean, default: false },
     otp: { type: String, default: null },
     otpExpiry: { type: Date, default: null },
+    roles: { type: [String], enum: ['admin', 'voter'], default: ['admin'] },
   },
   { timestamps: true },
 );

@@ -1,21 +1,43 @@
 const User = require("../Models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { encryptDescriptor } = require("../utils/faceCrypto");
+const { encryptDescriptor, decryptDescriptor } = require("../utils/faceCrypto");
 const { generateOTP, sendOTPEmail } = require("../utils/emailOtp");
 
+const euclideanDistance = (desc1, desc2) => {
+  if (desc1.length !== desc2.length) return Infinity;
+  let sum = 0;
+  for (let i = 0; i < desc1.length; i++) {
+    sum += Math.pow(desc1[i] - desc2[i], 2);
+  }
+  return Math.sqrt(sum);
+};
+
 const register = async (req, res) => {
-  const { name, email, password, jobTitle, faceDescriptor } = req.body;
+  const { name, email, password, jobTitle, faceDescriptor, role } = req.body;
+  const userRole = role === 'voter' ? 'voter' : 'admin';
+  
   console.log("\n🔐 REGISTER REQUEST RECEIVED");
   console.log(`   Email: ${email}`);
   console.log(`   Name: ${name}`);
+  console.log(`   Role: ${userRole}`);
 
   try {
     // Check duplicate
     const existingUser = await User.findOne({ email });
     if (existingUser && existingUser.isEmailVerified) {
+      const currentRoles = existingUser.roles || [existingUser.role || 'admin'];
+      if (!currentRoles.includes(userRole)) {
+         // Silently append the new role and bypass OTP because they are already verified!
+         existingUser.roles = [...currentRoles, userRole];
+         await existingUser.save();
+         return res.status(200).json({
+            message: "Role successfully appended to your existing account! Please proceed to login.",
+            alreadyVerified: true
+         });
+      }
       return res.status(400).json({
-        message: "User already exists",
+        message: "User already exists with this role. Please login.",
       });
     }
 
@@ -47,6 +69,7 @@ const register = async (req, res) => {
       user.password = hashedPassword;
       user.jobTitle = jobTitle;
       user.faceDescriptor = encryptedDescriptor || null;
+      user.roles = [userRole];
       user.otp = otp;
       user.otpExpiry = otpExpiry;
       await user.save();
@@ -58,6 +81,7 @@ const register = async (req, res) => {
         password: hashedPassword,
         jobTitle,
         faceDescriptor: encryptedDescriptor || null,
+        roles: [userRole],
         otp,
         otpExpiry,
         isEmailVerified: false,
@@ -147,11 +171,21 @@ const verifyOTP = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, role } = req.body;
+  const requestedRole = role === 'voter' ? 'voter' : 'admin';
   try {
     const userAvailable = await User.findOne({ email });
     if (!userAvailable) {
       return res.status(400).json({ message: "User not Exists" });
+    }
+    
+    const activeRoles = userAvailable.roles || [userAvailable.role || 'admin'];
+    
+    // Admins can log into both portals, but Voters can only log into Voter portal
+    if (!activeRoles.includes(requestedRole)) {
+      if (!(activeRoles.includes('admin') && requestedRole === 'voter')) {
+        return res.status(403).json({ message: `Access denied. Registered roles: [${activeRoles.join(', ')}], please use the correct portal.` });
+      }
     }
 
     if (!userAvailable.isEmailVerified) {
@@ -179,6 +213,8 @@ const loginUser = async (req, res) => {
         name: userAvailable.name,
         email: userAvailable.email,
         jobTitle: userAvailable.jobTitle,
+        roles: activeRoles,
+        activeSessionRole: requestedRole,
       },
     });
   } catch (error) {
@@ -273,4 +309,39 @@ const changePassword = async (req, res) => {
   }
 };
 
-module.exports = { register, loginUser, verifyOTP, resendOTP, changePassword };
+const verifyFace = async (req, res) => {
+  const { faceDescriptor } = req.body;
+  const userId = req.user.id; // from token middleware
+
+  if (!faceDescriptor || !Array.isArray(faceDescriptor)) {
+    return res.status(400).json({ message: "Invalid face descriptor provided" });
+  }
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (!user.faceDescriptor) {
+      return res.status(400).json({ message: "No face descriptor registered for this user" });
+    }
+
+    const savedDescriptor = decryptDescriptor(user.faceDescriptor);
+    const distance = euclideanDistance(faceDescriptor, savedDescriptor);
+
+    // threshold: lower is stricter. 0.55 is standard.
+    const isMatch = distance <= 0.55;
+
+    if (isMatch) {
+      res.status(200).json({ success: true, distance });
+    } else {
+      res.status(401).json({ success: false, message: "Face verification failed. Please try again.", distance });
+    }
+  } catch (error) {
+    console.error("verifyFace Error:", error);
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
+};
+
+module.exports = { register, loginUser, verifyOTP, resendOTP, changePassword, verifyFace };

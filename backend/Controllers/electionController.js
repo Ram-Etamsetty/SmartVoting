@@ -2,7 +2,7 @@ const electionModel = require('../Models/ElectionModel')
 
 
 const createElection = async (req, res) => {
-    const { title, description, type, status, startDate, endDate } = req.body
+    const { title, description, type, status, startDate, endDate, allowedVoters } = req.body
     try {
         if (!title || !startDate || !endDate) {
             return res.status(400).json({ message: "Title,StartDate and EndDate are required" })
@@ -14,6 +14,7 @@ const createElection = async (req, res) => {
             status: status || 'draft',
             startDate,
             endDate,
+            allowedVoters: allowedVoters || [],
             adminId: req.user.id
         })
         res.status(201).json(election)

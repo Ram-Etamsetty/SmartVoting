@@ -1,12 +1,11 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../Context/AuthContext'
+import { useState, useEffect } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 
 const CreateElection = () => {
     const navigate = useNavigate()
-    const { token } = useAuth()
+    const location = useLocation()
 
-    const [form, setForm] = useState({
+    const [form, setForm] = useState(location.state?.prevData || {
         title: '',
         description: '',
         type: 'election',
@@ -15,13 +14,12 @@ const CreateElection = () => {
         status: 'draft'
     })
     const [error, setError] = useState('')
-    const [loading, setLoading] = useState(false)
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value })
     }
 
-    const onSubmitHandler = async (e) => {
+    const onSubmitHandler = (e) => {
         e.preventDefault()
         setError('')
 
@@ -31,27 +29,8 @@ const CreateElection = () => {
             return
         }
 
-        setLoading(true)
-        try {
-            const res = await fetch('http://localhost:4000/api/elections', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(form)
-            })
-            const data = await res.json()
-            if (!res.ok) {
-                setError(data.message || 'Failed to create election')
-                setLoading(false)
-                return
-            }
-            navigate('/dashboard')
-        } catch (err) {
-            setError('Could not connect to server.')
-            setLoading(false)
-        }
+        // Navigate to Voters Upload page
+        navigate('/create-election/voters', { state: { electionData: form } })
     }
 
     return (
@@ -206,10 +185,8 @@ const CreateElection = () => {
                         </button>
                         <button
                             type='submit'
-                            disabled={loading}
-                            className={`w-[50%] px-7 py-3 text-white font-semibold text-md inter-font my-2 rounded-md flex items-center justify-center gap-2
-                            ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-[#00263A] cursor-pointer hover:bg-[#001a28] transition"}`}>
-                            {loading ? 'Creating...' : 'Create Election'}
+                            className='w-[50%] px-7 py-3 text-white font-semibold text-md inter-font my-2 rounded-md flex items-center justify-center gap-2 bg-[#00263A] cursor-pointer hover:bg-[#001a28] transition'>
+                            Next ➔
                         </button>
                     </div>
 

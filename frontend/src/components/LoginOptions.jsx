@@ -6,7 +6,7 @@ import { NavLink } from 'react-router-dom'
 const LoginOptions = () => {
     return (
         <div className="flex justify-between items-center min-h-50 bg-gray-50 p-4">
-            <div className="w-full max-w-115 bg-white rounded-lg shadow-sm border border-gray-100 p-6 flex gap-5 transition-shadow hover:shadow-md cursor-pointer">
+            <NavLink to='/voter-login' className="w-full max-w-115 bg-white rounded-lg shadow-sm border border-gray-100 p-6 flex gap-5 transition-shadow hover:shadow-md cursor-pointer">
                 <img src={voter} alt="Voter Icon" className="w-24 h-24 rounded-2xl object-cover shrink-0" />
                 <div className="flex flex-col justify-between w-full py-1">
                     <h3 className="text-3xl font-black italic text-slate-800 leading-none">
@@ -19,7 +19,7 @@ const LoginOptions = () => {
                     </div>
 
                 </div>
-            </div>
+            </NavLink>
             <NavLink to='/get-started' className="w-full max-w-115 bg-white rounded-lg shadow-sm border border-gray-100 p-6 flex gap-5 transition-shadow hover:shadow-md cursor-pointer">
                 <img src={admin1} alt="Admin Icon" className="w-24 h-24 rounded-2xl object-cover shrink-0" />
                 <div className="flex flex-col justify-between w-full py-1">

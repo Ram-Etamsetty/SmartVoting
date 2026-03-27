@@ -6,6 +6,7 @@ import { ButtonSpinner, SkeletonLoader } from "../components/Spinners";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
 import ProfileModal from "../components/ProfileModal";
+import FaceVerificationModal from "../components/FaceVerificationModal";
 
 const StatusBadge = ({ status }) => {
   const styles = {
@@ -101,6 +102,7 @@ const Dashboard = () => {
   const [elections, setElections] = useState([]);
   const [loading, setLoading] = useState(true);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [verifyModalOpen, setVerifyModalOpen] = useState(false);
   const { user, logout, token } = useAuth();
   const navigate = useNavigate();
   const { success, error } = useToast();
@@ -175,12 +177,12 @@ const Dashboard = () => {
 
           {/* Create Election Button */}
           <div className="mb-8 flex justify-end">
-            <NavLink
-              to="/create-election"
-              className="flex items-center gap-2 px-6 py-3 text-white font-semibold text-md inter-font rounded-md bg-[#00263A] hover:bg-[#001a28] transition shadow-md"
+            <button
+              onClick={() => setVerifyModalOpen(true)}
+              className="flex items-center gap-2 px-6 py-3 text-white font-semibold text-md inter-font rounded-md bg-[#00263A] hover:bg-[#001a28] transition shadow-md cursor-pointer"
             >
               🗳️ Create Election
-            </NavLink>
+            </button>
           </div>
 
           {/* Stats Grid */}
@@ -221,12 +223,12 @@ const Dashboard = () => {
               <p className="inter-font text-gray-600 mb-6">
                 Create your first election to get started
               </p>
-              <NavLink
-                to="/create-election"
-                className="inline-block px-8 py-3 text-white font-semibold text-md inter-font rounded-md bg-[#00263A] hover:bg-[#001a28] transition"
+              <button
+                onClick={() => setVerifyModalOpen(true)}
+                className="inline-block px-8 py-3 text-white font-semibold text-md inter-font rounded-md bg-[#00263A] hover:bg-[#001a28] transition cursor-pointer"
               >
                 Create Election
-              </NavLink>
+              </button>
             </div>
           ) : (
             <div>
@@ -260,6 +262,15 @@ const Dashboard = () => {
         isOpen={profileModalOpen}
         onClose={() => setProfileModalOpen(false)}
         user={user}
+      />
+
+      <FaceVerificationModal
+        isOpen={verifyModalOpen}
+        onClose={() => setVerifyModalOpen(false)}
+        onSuccess={() => {
+          setVerifyModalOpen(false);
+          navigate("/create-election");
+        }}
       />
     </div>
   );

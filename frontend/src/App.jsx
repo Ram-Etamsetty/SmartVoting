@@ -10,19 +10,33 @@ import Services from "./pages/Services";
 import GetStarted from "./pages/GetStarted";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
+import VoterLogin from "./pages/VoterLogin";
+import VoterRegister from "./pages/VoterRegister";
+import VoterDashboard from "./pages/VoterDashboard";
 import ProtectRoute from "./components/ProtectRoute";
 import GuestRoute from "./components/GuestRoute";
-import { AuthProvider } from "./Context/AuthContext";
+import { AuthProvider, useAuth } from "./Context/AuthContext";
 import { ToastProvider } from "./Context/ToastContext";
 import CreateElection from "./pages/CreateElection";
+import UploadVoters from "./pages/UploadVoters";
+import ProfileModal from "./components/ProfileModal";
+import { useState } from "react";
 
 
 const Layout = ({ children }) => {
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const { user } = useAuth();
+
   return (
     <div>
-      <NavBar></NavBar>
+      <NavBar onProfileClick={() => setProfileModalOpen(true)}></NavBar>
       {children}
       <Footer></Footer>
+      <ProfileModal
+        isOpen={profileModalOpen}
+        onClose={() => setProfileModalOpen(false)}
+        user={user}
+      />
     </div>
   );
 };
@@ -84,6 +98,36 @@ const App = () => {
               </GuestRoute>
             }
           />
+          <Route
+            path="/voter-register"
+            element={
+              <GuestRoute>
+                <Layout>
+                  <VoterRegister />
+                </Layout>
+              </GuestRoute>
+            }
+          />
+          <Route
+            path="/voter-login"
+            element={
+              <GuestRoute>
+                <Layout>
+                  <VoterLogin />
+                </Layout>
+              </GuestRoute>
+            }
+          />
+          <Route
+            path="/voter-dashboard"
+            element={
+              <ProtectRoute allowedRole="voter">
+                <Layout>
+                  <VoterDashboard />
+                </Layout>
+              </ProtectRoute>
+            }
+          />
           <Route path="/pricing" />
 
           <Route
@@ -100,6 +144,16 @@ const App = () => {
               <ProtectRoute>
                 <Layout>
                   <CreateElection></CreateElection>
+                </Layout>
+              </ProtectRoute>
+            }
+          ></Route>
+          <Route
+            path="/create-election/voters"
+            element={
+              <ProtectRoute>
+                <Layout>
+                  <UploadVoters></UploadVoters>
                 </Layout>
               </ProtectRoute>
             }
