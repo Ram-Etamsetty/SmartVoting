@@ -9,15 +9,18 @@ import MeetingVotes from "./pages/MeetingVotes";
 import Services from "./pages/Services";
 import GetStarted from "./pages/GetStarted";
 import Dashboard from "./pages/Dashboard";
+import ElectionDetails from "./pages/ElectionDetails";
 import Login from "./pages/Login";
 import VoterLogin from "./pages/VoterLogin";
 import VoterRegister from "./pages/VoterRegister";
 import VoterDashboard from "./pages/VoterDashboard";
+import VoterElectionDetails from "./pages/VoterElectionDetails";
 import ProtectRoute from "./components/ProtectRoute";
 import GuestRoute from "./components/GuestRoute";
 import { AuthProvider, useAuth } from "./Context/AuthContext";
 import { ToastProvider } from "./Context/ToastContext";
 import CreateElection from "./pages/CreateElection";
+import AddCandidates from "./pages/AddCandidates";
 import UploadVoters from "./pages/UploadVoters";
 import ProfileModal from "./components/ProfileModal";
 import { useState } from "react";
@@ -118,32 +121,48 @@ const App = () => {
               </GuestRoute>
             }
           />
-          <Route
-            path="/voter-dashboard"
-            element={
-              <ProtectRoute allowedRole="voter">
-                <Layout>
-                  <VoterDashboard />
-                </Layout>
-              </ProtectRoute>
-            }
-          />
-          <Route path="/pricing" />
+          {/* <Route path="/pricing" /> */}
+
+          <Route path='/dashboard' element={
+            <ProtectRoute allowedRoles={['admin']}>
+              <Dashboard />
+            </ProtectRoute>
+          } />
+
+          <Route path='/dashboard/election/:id' element={
+            <ProtectRoute allowedRoles={['admin']}>
+              <ElectionDetails />
+            </ProtectRoute>
+          } />
+
+          <Route path='/voter-dashboard' element={
+            <ProtectRoute allowedRoles={['voter']}>
+              <VoterDashboard />
+            </ProtectRoute>
+          } />
+
+          <Route path='/voter-dashboard/election/:id' element={
+            <ProtectRoute allowedRoles={['voter']}>
+              <VoterElectionDetails />
+            </ProtectRoute>
+          } />
 
           <Route
-            path="/dashboard"
-            element={
-              <ProtectRoute>
-                <Dashboard></Dashboard>
-              </ProtectRoute>
-            }
-          ></Route>
-          <Route
-            path="create-election"
+            path="/create-election"
             element={
               <ProtectRoute>
                 <Layout>
                   <CreateElection></CreateElection>
+                </Layout>
+              </ProtectRoute>
+            }
+          ></Route>
+          <Route
+            path="create-election/candidates"
+            element={
+              <ProtectRoute>
+                <Layout>
+                  <AddCandidates />
                 </Layout>
               </ProtectRoute>
             }

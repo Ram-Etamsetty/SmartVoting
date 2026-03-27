@@ -7,6 +7,7 @@ import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
 import ProfileModal from "../components/ProfileModal";
 import FaceVerificationModal from "../components/FaceVerificationModal";
+import ActivationModal from "../components/ActivationModal";
 
 const StatusBadge = ({ status }) => {
   const styles = {
@@ -41,7 +42,7 @@ const StatCard = ({ icon, label, value }) => {
   );
 };
 
-const ElectionCard = ({ election, onDelete, onView }) => {
+const ElectionCard = ({ election, onDelete, onView, onActivate, onEdit }) => {
   const [deleting, setDeleting] = useState(false);
   const { error } = useToast();
 
@@ -64,9 +65,9 @@ const ElectionCard = ({ election, onDelete, onView }) => {
   };
 
   return (
-    <div className="bg-white border border-gray-200 px-6 py-4 flex items-center justify-between hover:shadow-md hover:border-[#F28A36]/40 transition-all duration-200 rounded-lg">
-      <div className="flex flex-col gap-1 flex-1">
-        <h3 className="inter-font text-[#00263A] font-semibold text-base">
+    <div className="bg-white border border-gray-200 px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:shadow-md hover:border-[#F28A36]/40 transition-all duration-200 rounded-lg">
+      <div className="flex flex-col gap-1 w-full sm:flex-1">
+        <h3 className="inter-font text-[#00263A] font-semibold text-base break-words">
           {election.title}
         </h3>
         {election.description && (
@@ -78,21 +79,39 @@ const ElectionCard = ({ election, onDelete, onView }) => {
           {format(election.startDate)} — {format(election.endDate)}
         </p>
       </div>
-      <div className="flex items-center gap-5 shrink-0">
+      <div className="flex items-center gap-4 sm:gap-5 w-full sm:w-auto shrink-0 border-t sm:border-t-0 pt-3 sm:pt-0 mt-1 sm:mt-0 border-gray-100 justify-between sm:justify-end">
         <StatusBadge status={election.status} />
-        <button
-          onClick={() => onView(election._id)}
-          className="inter-font text-sm text-blue-600 hover:text-blue-700 cursor-pointer transition font-medium"
-        >
-          View
-        </button>
-        <button
-          onClick={handleDelete}
-          disabled={deleting}
-          className="inter-font text-sm text-red-600 hover:text-red-700 cursor-pointer transition font-medium disabled:opacity-50"
-        >
-          {deleting ? <ButtonSpinner size="sm" /> : "Delete"}
-        </button>
+        <div className="flex items-center gap-4">
+            {election.status === "draft" && (
+              <button
+                onClick={() => onEdit(election)}
+                className="inter-font text-sm text-yellow-600 hover:text-yellow-700 cursor-pointer transition font-medium"
+              >
+                Edit
+              </button>
+            )}
+            {election.status === "draft" && (
+              <button
+                onClick={() => onActivate(election)}
+                className="inter-font text-sm text-green-600 hover:text-green-700 cursor-pointer transition font-medium"
+              >
+                Activate
+              </button>
+            )}
+            <button
+              onClick={() => onView(election._id)}
+              className="inter-font text-sm text-blue-600 hover:text-blue-700 cursor-pointer transition font-medium"
+            >
+              View
+            </button>
+            <button
+              onClick={handleDelete}
+              disabled={deleting}
+              className="inter-font text-sm text-red-600 hover:text-red-700 cursor-pointer transition font-medium disabled:opacity-50"
+            >
+              {deleting ? <ButtonSpinner size="sm" /> : "Delete"}
+            </button>
+        </div>
       </div>
     </div>
   );
@@ -103,6 +122,12 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [verifyModalOpen, setVerifyModalOpen] = useState(false);
+  
+  // Activation Modal State
+  const [activateModalOpen, setActivateModalOpen] = useState(false);
+  const [electionToActivate, setElectionToActivate] = useState(null);
+  const [activating, setActivating] = useState(false);
+
   const { user, logout, token } = useAuth();
   const navigate = useNavigate();
   const { success, error } = useToast();
@@ -141,14 +166,45 @@ const Dashboard = () => {
   };
 
   const handleView = (id) => {
-    // TODO: Navigate to election details page
-    console.log("View election:", id);
+    navigate(`/dashboard/election/${id}`);
+  };
+
+  const handleEdit = (election) => {
+    navigate('/create-election', { state: { prevData: election } });
   };
 
   const handleLogout = () => {
     logout();
     success("Logged out successfully");
-    navigate("/");
+    navigate("/", { replace: true });
+  };
+
+  const promptActivate = (election) => {
+    setElectionToActivate(election);
+    setActivateModalOpen(true);
+  };
+
+  const confirmActivate = async () => {
+    if (!electionToActivate) return;
+    setActivating(true);
+    try {
+      const res = await fetch(`http://localhost:4000/api/elections/${electionToActivate._id}/activate`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Failed to activate");
+      setElections((prev) => 
+        prev.map(e => e._id === electionToActivate._id ? { ...e, status: "active" } : e)
+      );
+      success("Election activated successfully!");
+      setActivateModalOpen(false);
+    } catch (err) {
+      console.log("Activate Failed", err);
+      error("Failed to activate election");
+    } finally {
+      setActivating(false);
+      setElectionToActivate(null);
+    }
   };
 
   const stats = {
@@ -163,7 +219,7 @@ const Dashboard = () => {
       <NavBar onProfileClick={() => setProfileModalOpen(true)} />
 
       {/* Main Content */}
-      <main className="flex-1 min-h-screen bg-[#FAFAFA] px-8 py-8">
+      <main className="flex-1 min-h-screen bg-[#FAFAFA] px-4 sm:px-8 py-6 sm:py-8">
         <div className="max-w-7xl mx-auto">
           {/* Dashboard Header */}
           <div className="mb-8">
@@ -187,7 +243,7 @@ const Dashboard = () => {
 
           {/* Stats Grid */}
           {!loading && elections.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               <StatCard
                 icon="📊"
                 label="Total Elections"
@@ -247,6 +303,8 @@ const Dashboard = () => {
                     election={election}
                     onDelete={handleDelete}
                     onView={handleView}
+                    onActivate={promptActivate}
+                    onEdit={handleEdit}
                   />
                 ))}
               </div>
@@ -271,6 +329,14 @@ const Dashboard = () => {
           setVerifyModalOpen(false);
           navigate("/create-election");
         }}
+      />
+
+      <ActivationModal
+        isOpen={activateModalOpen}
+        onClose={() => setActivateModalOpen(false)}
+        onConfirm={confirmActivate}
+        electionName={electionToActivate?.title}
+        loading={activating}
       />
     </div>
   );

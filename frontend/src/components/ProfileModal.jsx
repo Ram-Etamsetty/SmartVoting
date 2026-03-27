@@ -67,12 +67,10 @@ const ProfileModal = ({ isOpen, onClose, user }) => {
   };
 
   const handleLogout = () => {
-    navigate("/");
-    setTimeout(() => {
-        logout();
-        success("Logged out successfully");
-        onClose();
-    }, 10);
+    logout();
+    success("Logged out successfully");
+    onClose();
+    navigate("/", { replace: true });
   };
 
   if (!isOpen || !user) return null;

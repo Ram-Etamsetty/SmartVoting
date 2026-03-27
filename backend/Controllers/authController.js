@@ -14,9 +14,10 @@ const euclideanDistance = (desc1, desc2) => {
 };
 
 const register = async (req, res) => {
-  const { name, email, password, jobTitle, faceDescriptor, role } = req.body;
-  const userRole = role === 'voter' ? 'voter' : 'admin';
-  
+  let { name, email, password, jobTitle, faceDescriptor, role } = req.body;
+  email = email?.toLowerCase().trim();
+  const userRole = role === "voter" ? "voter" : "admin";
+
   console.log("\n🔐 REGISTER REQUEST RECEIVED");
   console.log(`   Email: ${email}`);
   console.log(`   Name: ${name}`);
@@ -26,15 +27,16 @@ const register = async (req, res) => {
     // Check duplicate
     const existingUser = await User.findOne({ email });
     if (existingUser && existingUser.isEmailVerified) {
-      const currentRoles = existingUser.roles || [existingUser.role || 'admin'];
+      const currentRoles = existingUser.roles || [existingUser.role || "admin"];
       if (!currentRoles.includes(userRole)) {
-         // Silently append the new role and bypass OTP because they are already verified!
-         existingUser.roles = [...currentRoles, userRole];
-         await existingUser.save();
-         return res.status(200).json({
-            message: "Role successfully appended to your existing account! Please proceed to login.",
-            alreadyVerified: true
-         });
+        // Silently append the new role and bypass OTP because they are already verified!
+        existingUser.roles = [...currentRoles, userRole];
+        await existingUser.save();
+        return res.status(200).json({
+          message:
+            "Role successfully appended to your existing account! Please proceed to login.",
+          alreadyVerified: true,
+        });
       }
       return res.status(400).json({
         message: "User already exists with this role. Please login.",
@@ -95,8 +97,8 @@ const register = async (req, res) => {
 
     if (!emailSent) {
       console.error(`❌ REGISTER FAILED: Email send returned false`);
-      return res.status(500).json({
-        message: "Failed to send OTP email. Please try again.",
+      return res.status(400).json({
+        message: "Email does not exist. Please enter a valid email address.",
       });
     }
 
@@ -115,7 +117,8 @@ const register = async (req, res) => {
 };
 
 const verifyOTP = async (req, res) => {
-  const { email, otp } = req.body;
+  let { email, otp } = req.body;
+  email = email?.toLowerCase().trim();
   try {
     const user = await User.findOne({ email });
 
@@ -152,7 +155,9 @@ const verifyOTP = async (req, res) => {
     await user.save();
 
     // Generate JWT token
-    const token = jwt.sign({ id: user._id }, "secret123", { expiresIn: "7d" });
+    const token = jwt.sign({ id: user._id, email: user.email }, "secret123", {
+      expiresIn: "7d",
+    });
 
     res.status(200).json({
       message: "Email verified successfully. Registration complete!",
@@ -162,6 +167,8 @@ const verifyOTP = async (req, res) => {
         name: user.name,
         email: user.email,
         jobTitle: user.jobTitle,
+        roles: user.roles,
+        activeSessionRole: user.roles.includes("voter") ? "voter" : "admin",
         isEmailVerified: user.isEmailVerified,
       },
     });
@@ -171,20 +178,25 @@ const verifyOTP = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
-  const { email, password, role } = req.body;
-  const requestedRole = role === 'voter' ? 'voter' : 'admin';
+  let { email, password, role } = req.body;
+  email = email?.toLowerCase().trim();
+  const requestedRole = role === "voter" ? "voter" : "admin";
   try {
     const userAvailable = await User.findOne({ email });
     if (!userAvailable) {
       return res.status(400).json({ message: "User not Exists" });
     }
-    
-    const activeRoles = userAvailable.roles || [userAvailable.role || 'admin'];
-    
+
+    const activeRoles = userAvailable.roles || [userAvailable.role || "admin"];
+
     // Admins can log into both portals, but Voters can only log into Voter portal
     if (!activeRoles.includes(requestedRole)) {
-      if (!(activeRoles.includes('admin') && requestedRole === 'voter')) {
-        return res.status(403).json({ message: `Access denied. Registered roles: [${activeRoles.join(', ')}], please use the correct portal.` });
+      if (!(activeRoles.includes("admin") && requestedRole === "voter")) {
+        return res
+          .status(403)
+          .json({
+            message: `Access denied. Registered roles: [${activeRoles.join(", ")}], please use the correct portal.`,
+          });
       }
     }
 
@@ -202,9 +214,13 @@ const loginUser = async (req, res) => {
       return res.status(400).json({ message: "Incorrect Password" });
     }
 
-    const token = jwt.sign({ id: userAvailable._id }, "secret123", {
-      expiresIn: "7d",
-    });
+    const token = jwt.sign(
+      { id: userAvailable._id, email: userAvailable.email },
+      "secret123",
+      {
+        expiresIn: "7d",
+      },
+    );
 
     res.status(200).json({
       token,
@@ -223,7 +239,8 @@ const loginUser = async (req, res) => {
 };
 
 const resendOTP = async (req, res) => {
-  const { email } = req.body;
+  let { email } = req.body;
+  email = email?.toLowerCase().trim();
   try {
     const user = await User.findOne({ email });
 
@@ -251,8 +268,8 @@ const resendOTP = async (req, res) => {
     // Send OTP email
     const emailSent = await sendOTPEmail(email, otp);
     if (!emailSent) {
-      return res.status(500).json({
-        message: "Failed to send OTP email. Please try again.",
+      return res.status(400).json({
+        message: "Email does not exist. Please enter a valid email address.",
       });
     }
 
@@ -314,7 +331,9 @@ const verifyFace = async (req, res) => {
   const userId = req.user.id; // from token middleware
 
   if (!faceDescriptor || !Array.isArray(faceDescriptor)) {
-    return res.status(400).json({ message: "Invalid face descriptor provided" });
+    return res
+      .status(400)
+      .json({ message: "Invalid face descriptor provided" });
   }
 
   try {
@@ -324,7 +343,9 @@ const verifyFace = async (req, res) => {
     }
 
     if (!user.faceDescriptor) {
-      return res.status(400).json({ message: "No face descriptor registered for this user" });
+      return res
+        .status(400)
+        .json({ message: "No face descriptor registered for this user" });
     }
 
     const savedDescriptor = decryptDescriptor(user.faceDescriptor);
@@ -336,7 +357,13 @@ const verifyFace = async (req, res) => {
     if (isMatch) {
       res.status(200).json({ success: true, distance });
     } else {
-      res.status(401).json({ success: false, message: "Face verification failed. Please try again.", distance });
+      res
+        .status(401)
+        .json({
+          success: false,
+          message: "Face verification failed. Please try again.",
+          distance,
+        });
     }
   } catch (error) {
     console.error("verifyFace Error:", error);
@@ -344,4 +371,11 @@ const verifyFace = async (req, res) => {
   }
 };
 
-module.exports = { register, loginUser, verifyOTP, resendOTP, changePassword, verifyFace };
+module.exports = {
+  register,
+  loginUser,
+  verifyOTP,
+  resendOTP,
+  changePassword,
+  verifyFace,
+};

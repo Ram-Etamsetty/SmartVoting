@@ -16,6 +16,7 @@ const UploadVoters = () => {
     const [fileName, setFileName] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [manualEmail, setManualEmail] = useState('');
 
     // If no election data present, gracefully return to previous step
     if (!electionData) {
@@ -58,7 +59,7 @@ const UploadVoters = () => {
                             email = possibleEmail;
                         }
                     }
-                    return { email: String(email).trim() };
+                    return { email: String(email).trim().toLowerCase() };
                 })
                 // Filter out empty emails
                 .filter(voter => voter.email !== '');
@@ -74,6 +75,29 @@ const UploadVoters = () => {
         }
     };
 
+    const handleAddManualVoter = (e) => {
+        e.preventDefault();
+        const email = manualEmail.trim();
+        
+        if (!email || !email.includes('@')) {
+            setError('Please enter a valid email address.');
+            return;
+        }
+        
+        if (voters.some(v => v.email.toLowerCase() === email.toLowerCase())) {
+            setError('This email is already in the list.');
+            return;
+        }
+
+        setVoters([{ email: email.toLowerCase() }, ...voters]);
+        setManualEmail('');
+        setError('');
+    };
+
+    const removeVoter = (indexToRemove) => {
+        setVoters(voters.filter((_, index) => index !== indexToRemove));
+    };
+
     const onSubmitHandler = async () => {
         if (voters.length === 0) {
             setError('Please upload a valid CSV list of voters before creating the election.');
@@ -84,8 +108,13 @@ const UploadVoters = () => {
         setError('');
 
         try {
-            const res = await fetch('http://localhost:4000/api/elections', {
-                method: 'POST',
+            const isEdit = !!electionData._id;
+            const url = isEdit 
+                ? `http://localhost:4000/api/elections/${electionData._id}` 
+                : 'http://localhost:4000/api/elections';
+                
+            const res = await fetch(url, {
+                method: isEdit ? 'PUT' : 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
@@ -99,12 +128,12 @@ const UploadVoters = () => {
             const data = await res.json();
             
             if (!res.ok) {
-                setError(data.message || 'Failed to create election');
+                setError(data.message || `Failed to ${isEdit ? 'update' : 'create'} election`);
                 setLoading(false);
                 return;
             }
             
-            // Successfully created! Navigate to dashboard
+            // Successfully created or updated! Navigate to dashboard
             navigate('/dashboard');
         } catch (err) {
             setError('Could not connect to server.');
@@ -113,8 +142,8 @@ const UploadVoters = () => {
     };
 
     return (
-        <div className='flex items-start justify-center px-4 py-10 bg-[#FAFAFA] min-h-[80vh]'>
-            <div className='w-full max-w-4xl bg-white border border-gray-200 px-10 py-8'>
+        <div className='flex items-start justify-center px-4 py-6 sm:py-10 bg-[#FAFAFA] min-h-[80vh]'>
+            <div className='w-full max-w-4xl bg-white border border-gray-200 px-6 sm:px-10 py-8'>
                 
                 <div className='mb-8'>
                     <h1 className='inter-font text-[32px] font-semibold text-[#262D34] mb-1'>
@@ -145,6 +174,23 @@ const UploadVoters = () => {
                     </label>
                 </div>
 
+                {/* Manual Add Section */}
+                <div className='mb-8 pb-6 border-b border-gray-100 border-dashed'>
+                    <p className='text-[16px] text-[#262D3A] font-semibold inter-font mb-2'>Or add voters manually:</p>
+                    <form onSubmit={handleAddManualVoter} className='flex flex-col sm:flex-row gap-3'>
+                        <input 
+                            type="email" 
+                            value={manualEmail} 
+                            onChange={(e) => setManualEmail(e.target.value)} 
+                            placeholder="voter.name@university.edu" 
+                            className="w-full sm:flex-1 px-4 py-3 bg-[#F3F7FE] border border-transparent focus:border-[#00263A] rounded outline-none transition"
+                        />
+                        <button type="submit" className="w-full sm:w-auto px-6 py-3 bg-[#F28A36] text-white font-semibold rounded hover:bg-[#e07b2f] transition whitespace-nowrap">
+                            + Add Single Voter
+                        </button>
+                    </form>
+                </div>
+
                 {/* Table Section */}
                 {voters.length > 0 && (
                     <div className='mb-8 border border-gray-200 rounded overflow-hidden'>
@@ -161,8 +207,18 @@ const UploadVoters = () => {
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
                                     {voters.slice(0, 100).map((v, i) => (
-                                        <tr key={i} className="hover:bg-gray-50">
-                                            <td className="px-6 py-4 text-gray-800">{v.email}</td>
+                                        <tr key={i} className="hover:bg-gray-50 group">
+                                            <td className="px-6 py-4 text-gray-800 flex justify-between items-center">
+                                                <span>{v.email}</span>
+                                                <button 
+                                                    type="button"
+                                                    onClick={() => removeVoter(i)} 
+                                                    className="text-red-400 hover:text-red-600 font-bold opacity-0 group-hover:opacity-100 transition px-2"
+                                                    title="Remove Voter"
+                                                >
+                                                    &times;
+                                                </button>
+                                            </td>
                                         </tr>
                                     ))}
                                     {voters.length > 100 && (
@@ -179,21 +235,21 @@ const UploadVoters = () => {
                 )}
 
                 {/* Buttons */}
-                <div className='flex gap-3 pt-4 border-t border-gray-100'>
+                <div className='flex flex-col-reverse sm:flex-row gap-3 pt-4 border-t border-gray-100'>
                     <button
                         type='button'
-                        onClick={() => navigate('/create-election', { state: { prevData: electionData } })}
-                        className='w-1/3 px-7 py-3 text-[#262D3A] bg-gray-200 font-semibold text-md inter-font rounded-md cursor-pointer hover:bg-gray-300 transition'>
+                        onClick={() => navigate('/create-election/candidates', { state: { electionData: electionData } })}
+                        className='w-full sm:w-1/3 px-7 py-3 text-[#262D3A] bg-gray-200 font-semibold text-md inter-font rounded-md cursor-pointer hover:bg-gray-300 transition'>
                         ← Back
                     </button>
                     <button
                         type='button'
                         onClick={onSubmitHandler}
                         disabled={loading || voters.length === 0}
-                        className={`w-2/3 px-7 py-3 flex items-center justify-center gap-2 text-white font-semibold text-md inter-font rounded-md transition shadow-sm
+                        className={`w-full sm:w-2/3 px-7 py-3 flex items-center justify-center gap-2 text-white font-semibold text-md inter-font rounded-md transition shadow-sm
                             ${loading || voters.length === 0 ? "bg-gray-400 cursor-not-allowed" : "bg-[#00263A] cursor-pointer hover:bg-[#001a28]"}`}>
                         {(loading) && <ButtonSpinner size="sm" />}
-                        {loading ? 'Finalizing Election...' : 'Finish & Create Election'}
+                        {loading ? 'Processing...' : (electionData?._id ? 'Save Changes' : 'Finish & Create Election')}
                     </button>
                 </div>
                 

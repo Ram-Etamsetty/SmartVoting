@@ -220,7 +220,7 @@ const GetStarted = () => {
 
   return (
     <div className="flex items-center justify-center px-4 py-2">
-      <div className=" w-125 flex flex-col gap-2 px-4 py-2">
+      <div className="w-full max-w-lg flex flex-col gap-2 px-4 py-2">
         <h1 className="inter-font text-[32px] font-semibold text-[#262D34]">
           Administrator Sign Up
         </h1>
@@ -327,7 +327,7 @@ const GetStarted = () => {
             <button
               type="submit"
               disabled={loading || !faceDescriptor}
-              className={`w-[70%] px-7 py-3 text-white font-semibold text-md inter-font my-2 rounded-md flex items-center justify-center gap-2
+              className={`w-full sm:w-[70%] px-7 py-3 text-white font-semibold text-md inter-font my-2 rounded-md flex items-center justify-center gap-2
                             ${loading || !faceDescriptor ? "bg-gray-400 cursor-not-allowed" : "bg-[#00263A] cursor-pointer hover:bg-[#001a28] transition"}`}
             >
               {loading && <ButtonSpinner size="sm" />}

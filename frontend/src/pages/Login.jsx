@@ -41,7 +41,7 @@ const Login = () => {
 
   return (
     <div className="flex items-center justify-center px-4 py-2">
-      <div className="flex flex-col gap-2 px-4 py-2 w-125">
+      <div className="flex flex-col gap-2 px-4 py-2 w-full max-w-md">
         <div>
           <h1 className="inter-font text-[32px] font-semibold text-[#262D34]">
             Administrator Login
@@ -89,7 +89,7 @@ const Login = () => {
             <button
               type="submit"
               disabled={loading}
-              className={`w-[70%] px-7 py-3 text-white font-semibold text-md inter-font my-2 rounded-md flex items-center justify-center gap-2
+              className={`w-full sm:w-[70%] px-7 py-3 text-white font-semibold text-md inter-font my-2 rounded-md flex items-center justify-center gap-2
                             ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-[#00263A] cursor-pointer hover:bg-[#001a28] transition"}`}
             >
               {loading && <ButtonSpinner size="sm" />}

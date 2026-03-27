@@ -5,8 +5,8 @@ import ulu from '../assets/users-love-us.png'
 
 const Hero = () => {
     return (
-        <div className='bg-white flex items-center justify-between mx-8 my-7'>
-            <div className='px-6 py-5 max-w-150' >
+        <div className='bg-white flex flex-col lg:flex-row items-center justify-between mx-4 sm:mx-8 my-7 gap-8 lg:gap-4'>
+            <div className='px-4 sm:px-6 py-5 w-full max-w-150 text-center lg:text-left flex flex-col items-center lg:items-start' >
                 <p className='text-orange-400 font-semibold text-3xl py-3  popin-font'>Loved in 100+ Organisations</p>
                 <h1 className='varela-font text-4xl md:text-5xl lg:text-6xl py-4 font-extrabold'>Easy Online Election </h1>
                 <h1 className='varela-font text-6xl  font-extrabold'>Excellence</h1>
@@ -24,8 +24,8 @@ const Hero = () => {
                         at a great price!" Executive Director</p>
                 </div>
             </div>
-            <div>
-                <img className='h-160 w-200' src={home_cover} alt="" />
+            <div className='w-full lg:w-1/2 flex justify-center'>
+                <img className='w-full max-w-lg lg:max-w-none lg:h-160 lg:w-200 object-contain' src={home_cover} alt="" />
             </div>
         </div >
     )
