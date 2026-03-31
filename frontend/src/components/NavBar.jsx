@@ -15,16 +15,16 @@ const NavBar = ({ onProfileClick }) => {
     >
       <div className="flex justify-between lg:justify-around items-center px-4 sm:px-8 py-2 sm:py-0">
         <Link to={user ? (user.activeSessionRole === 'voter' ? '/voter-dashboard' : '/dashboard') : "/"}>
-          <img src={logo} alt="logo" className="h-10 w-40 sm:h-15 sm:w-60 cursor-pointer object-contain" />
+          <img src={logo} alt="logo" className="h-30 w-40 sm:h-15 sm:w-60 cursor-pointer object-contain" />
         </Link>
         <div className="hidden lg:flex items-center justify-around">
           <div className="px-5 py-6 text-xl text-gray-400 hover:text-gray-700 hover:border-b-black">
             <NavLink to="/elections"> Elections </NavLink>
           </div>
-          <div className="px-5 py-6 text-xl text-gray-400 hover:text-gray-700 hover:border-b-black">
+          <div className="hidden px-5 py-6 text-xl text-gray-400 hover:text-gray-700 hover:border-b-black">
             <NavLink to="/meeting-votes"> Meeting Votes </NavLink>
           </div>
-          <div className="px-5 py-6 text-xl text-gray-400 hover:text-gray-700 hover:border-b-black">
+          <div className="hidden px-5 py-6 text-xl text-gray-400 hover:text-gray-700 hover:border-b-black">
             <NavLink to="/services"> Services </NavLink>
           </div>
           <div className="hidden px-5 py-6 text-xl text-gray-400 hover:text-gray-700 hover:border-b-black">

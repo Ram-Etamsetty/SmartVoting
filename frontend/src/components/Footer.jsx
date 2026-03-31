@@ -3,7 +3,7 @@ import { FaFacebookF, FaInstagram, FaTwitter } from "react-icons/fa";
 const Footer = () => {
     return (
         <div className='flex items-center justify-around border-t border-gray-300 h-50'>
-            <div className='text-[14px] text-black inter-font'>© 2011-2026 ElectionBuddy, Inc. All Rights Reserved</div>
+            <div className='text-[14px] text-black inter-font'>© Smart Voting, Inc. All Rights Reserved</div>
             <ul className='flex gap-5 items-center justify-between text-sm px-5'>
                 <li className='px-5'>Privacy Policy</li>
                 <li className='px-5'>Terms of Service</li>
