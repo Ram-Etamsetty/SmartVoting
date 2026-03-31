@@ -51,6 +51,35 @@ const register = async (req, res) => {
       });
     }
 
+    // Check face uniqueness - Ensure this person doesn't already have an account with a different email
+    if (faceDescriptor) {
+      console.log(`   Checking face uniqueness...`);
+      const verifiedUsersWithFaces = await User.find({ 
+        isEmailVerified: true, 
+        faceDescriptor: { $exists: true, $ne: null } 
+      });
+      
+      for (const u of verifiedUsersWithFaces) {
+        // Skip if it's the same email (the existing logic handles role appending)
+        if (u.email === email) continue;
+
+        try {
+          const savedDescriptor = decryptDescriptor(u.faceDescriptor);
+          const distance = euclideanDistance(faceDescriptor, savedDescriptor);
+          
+          if (distance <= 0.55) {
+            console.log(`   ❌ Face match found with user: ${u.email} (Distance: ${distance.toFixed(4)})`);
+            return res.status(400).json({
+              message: "This face is already registered with another email address. Please use your original account.",
+            });
+          }
+        } catch (err) {
+          console.error(`   ⚠️ Error decrypting descriptor for ${u.email}:`, err.message);
+        }
+      }
+      console.log(`   ✅ Face is unique.`);
+    }
+
     // Generate OTP
     const otp = generateOTP();
     const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes

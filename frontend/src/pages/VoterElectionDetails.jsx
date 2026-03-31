@@ -59,7 +59,11 @@ const VoterElectionDetails = () => {
 
   const handleConfirmVote = () => {
     setVoteConfirmationOpen(false);
-    setFaceVerificationOpen(true);
+    if (election.faceVerificationRequired) {
+      setFaceVerificationOpen(true);
+    } else {
+      handleFaceVerificationSuccess();
+    }
   };
 
   const handleFaceVerificationSuccess = async () => {

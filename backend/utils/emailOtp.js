@@ -55,10 +55,10 @@ const sendOTPEmail = async (email, otp) => {
   try {
     const transporter = createTransporter();
     const info = await transporter.sendMail(mailOptions);
-    console.log(`✅ OTP EMAIL SENT - MessageID: ${info.messageId}`);
+    console.log(`OTP EMAIL SENT - MessageID: ${info.messageId}`);
     return true;
   } catch (error) {
-    console.error(`❌ EMAIL FAILED:`, error.message);
+    console.error(`EMAIL FAILED:`, error.message);
     return false;
   }
 };

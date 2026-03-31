@@ -3,7 +3,7 @@ const BallotModel = require('../Models/BallotModel')
 
 
 const createElection = async (req, res) => {
-    const { title, description, type, status, startDate, endDate, candidates, allowedVoters } = req.body
+    const { title, description, type, status, startDate, endDate, candidates, allowedVoters, faceVerificationRequired } = req.body
     try {
         if (!title || !startDate || !endDate) {
             return res.status(400).json({ message: "Title,StartDate and EndDate are required" })
@@ -17,7 +17,8 @@ const createElection = async (req, res) => {
             endDate,
             candidates: candidates || [],
             allowedVoters: allowedVoters || [],
-            adminId: req.user.id
+            adminId: req.user.id,
+            faceVerificationRequired: faceVerificationRequired !== undefined ? faceVerificationRequired : false
         })
         res.status(201).json(election)
     } catch (error) {
@@ -216,7 +217,7 @@ const activateElection = async (req, res) => {
     }
 }
 const editElection = async (req, res) => {
-    const { title, description, type, startDate, endDate, candidates, allowedVoters } = req.body;
+    const { title, description, type, startDate, endDate, candidates, allowedVoters, faceVerificationRequired } = req.body;
     try {
         const election = await electionModel.findOne({ _id: req.params.id, adminId: req.user.id });
         if (!election) return res.status(404).json({ message: 'Election Not Found' });
@@ -232,6 +233,7 @@ const editElection = async (req, res) => {
         if (endDate) election.endDate = endDate;
         if (candidates) election.candidates = candidates;
         if (allowedVoters) election.allowedVoters = allowedVoters;
+        if (faceVerificationRequired !== undefined) election.faceVerificationRequired = faceVerificationRequired;
         
         await election.save();
         res.status(200).json({ message: 'Election Updated', election });

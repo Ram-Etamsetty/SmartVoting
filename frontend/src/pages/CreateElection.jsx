@@ -19,6 +19,7 @@ const CreateElection = () => {
       startDate: "",
       endDate: "",
       status: "draft",
+      faceVerificationRequired: false,
     };
 
   if (initialData._id) {
@@ -218,6 +219,56 @@ const CreateElection = () => {
                   />
                   <p
                     className={`inter-font text-sm font-semibold ${form.status === opt.value ? "text-[#00263A]" : "text-gray-500"}`}
+                  >
+                    {opt.label}
+                  </p>
+                  <p className="inter-font text-xs text-gray-400 mt-0.5">
+                    {opt.desc}
+                  </p>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Security Settings */}
+          <div className="flex flex-col gap-1.5 mt-2">
+            <label className="text-[16px] text-[#262D3A] inter-font font-semibold border-b pb-2 border-gray-200 mb-2">
+              🔒 Security Settings
+            </label>
+            <p className="text-sm text-gray-400 mb-2 inter-font">
+              Choose whether voters must verify their identity via face authentication before casting their vote.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3">
+              {[
+                {
+                  value: false,
+                  label: "🚫 No Verification",
+                  desc: "Voters can vote without face scan",
+                },
+                {
+                  value: true,
+                  label: "🛡️ Require Face ID",
+                  desc: "Voters must verify their face to vote",
+                },
+              ].map((opt) => (
+                <label
+                  key={String(opt.value)}
+                  className={`flex-1 px-4 py-3 border-2 cursor-pointer transition-all duration-200
+                                        ${
+                                          form.faceVerificationRequired === opt.value
+                                            ? "border-[#00263A] bg-[#00263A]/5"
+                                            : "border-gray-200 hover:border-gray-300"
+                                        }`}
+                >
+                  <input
+                    type="radio"
+                    name="faceVerificationRequired"
+                    checked={form.faceVerificationRequired === opt.value}
+                    onChange={() => setForm({ ...form, faceVerificationRequired: opt.value })}
+                    className="hidden"
+                  />
+                  <p
+                    className={`inter-font text-sm font-semibold ${form.faceVerificationRequired === opt.value ? "text-[#00263A]" : "text-gray-500"}`}
                   >
                     {opt.label}
                   </p>

@@ -16,7 +16,8 @@ const electionSchema = new mongoose.Schema({
         email: { type: String, required: true, lowercase: true, trim: true },
         hasVoted: { type: Boolean, default: false }
     }],
-    adminId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
+    adminId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    faceVerificationRequired: { type: Boolean, default: false }
 }, { timestamps: true })
 
 module.exports = mongoose.model('ElectionModel', electionSchema)
