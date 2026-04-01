@@ -8,6 +8,7 @@ import Footer from "../components/Footer";
 import ProfileModal from "../components/ProfileModal";
 import FaceVerificationModal from "../components/FaceVerificationModal";
 import ActivationModal from "../components/ActivationModal";
+import DeletionModal from "../components/DeletionModal";
 
 const StatusBadge = ({ status }) => {
   const styles = {
@@ -43,9 +44,6 @@ const StatCard = ({ icon, label, value }) => {
 };
 
 const ElectionCard = ({ election, onDelete, onView, onActivate, onEdit }) => {
-  const [deleting, setDeleting] = useState(false);
-  const { error } = useToast();
-
   const format = (d) =>
     new Date(d).toLocaleDateString("en-IN", {
       day: "numeric",
@@ -53,15 +51,8 @@ const ElectionCard = ({ election, onDelete, onView, onActivate, onEdit }) => {
       year: "numeric",
     });
 
-  const handleDelete = async () => {
-    if (!window.confirm("Are you sure you want to delete this election?"))
-      return;
-    setDeleting(true);
-    try {
-      await onDelete(election._id);
-    } finally {
-      setDeleting(false);
-    }
+  const handleDelete = () => {
+    onDelete(election);
   };
 
   return (
@@ -106,10 +97,9 @@ const ElectionCard = ({ election, onDelete, onView, onActivate, onEdit }) => {
             </button>
             <button
               onClick={handleDelete}
-              disabled={deleting}
               className="inter-font text-sm text-red-600 hover:text-red-700 cursor-pointer transition font-medium disabled:opacity-50"
             >
-              {deleting ? <ButtonSpinner size="sm" /> : "Delete"}
+              Delete
             </button>
         </div>
       </div>
@@ -127,6 +117,11 @@ const Dashboard = () => {
   const [activateModalOpen, setActivateModalOpen] = useState(false);
   const [electionToActivate, setElectionToActivate] = useState(null);
   const [activating, setActivating] = useState(false);
+
+  // Deletion Modal State
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [electionToDelete, setElectionToDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   const { user, logout, token } = useAuth();
   const navigate = useNavigate();
@@ -150,18 +145,29 @@ const Dashboard = () => {
     fetchElections();
   }, [token, error]);
 
-  const handleDelete = async (id) => {
+  const promptDelete = (election) => {
+    setElectionToDelete(election);
+    setDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!electionToDelete) return;
+    setDeleting(true);
     try {
-      const res = await fetch(`http://localhost:4000/api/elections/${id}`, {
+      const res = await fetch(`http://localhost:4000/api/elections/${electionToDelete._id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error("Delete failed");
-      setElections((prev) => prev.filter((e) => e._id !== id));
+      setElections((prev) => prev.filter((e) => e._id !== electionToDelete._id));
       success("Election deleted successfully");
+      setDeleteModalOpen(false);
     } catch (err) {
       console.log("Delete Failed", err);
       error("Failed to delete election");
+    } finally {
+      setDeleting(false);
+      setElectionToDelete(null);
     }
   };
 
@@ -301,7 +307,7 @@ const Dashboard = () => {
                   <ElectionCard
                     key={election._id}
                     election={election}
-                    onDelete={handleDelete}
+                    onDelete={promptDelete}
                     onView={handleView}
                     onActivate={promptActivate}
                     onEdit={handleEdit}
@@ -337,6 +343,14 @@ const Dashboard = () => {
         onConfirm={confirmActivate}
         electionName={electionToActivate?.title}
         loading={activating}
+      />
+
+      <DeletionModal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+        electionName={electionToDelete?.title}
+        loading={deleting}
       />
     </div>
   );

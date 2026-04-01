@@ -2,7 +2,7 @@ const User = require("../Models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { encryptDescriptor, decryptDescriptor } = require("../utils/faceCrypto");
-const { generateOTP, sendOTPEmail } = require("../utils/emailOtp");
+const { generateOTP, sendOTPEmail } = require("../utils/emailUtils");
 
 const euclideanDistance = (desc1, desc2) => {
   if (desc1.length !== desc2.length) return Infinity;

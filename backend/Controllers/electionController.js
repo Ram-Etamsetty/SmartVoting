@@ -1,5 +1,6 @@
 const electionModel = require('../Models/ElectionModel')
 const BallotModel = require('../Models/BallotModel')
+const { sendElectionNotification } = require('../utils/emailUtils')
 
 
 const createElection = async (req, res) => {
@@ -20,6 +21,36 @@ const createElection = async (req, res) => {
             adminId: req.user.id,
             faceVerificationRequired: faceVerificationRequired !== undefined ? faceVerificationRequired : false
         })
+
+        // Trigger emails in background if created as active
+        if (election.status === 'active') {
+            if (election.allowedVoters && election.allowedVoters.length > 0) {
+                const voterEmails = election.allowedVoters.map(v => v.email);
+                console.log(`🚀 Starting background email dispatch for ${voterEmails.length} voters...`);
+                console.log(`Target emails: ${voterEmails.join(', ')}`);
+                
+                (async () => {
+                    const results = await Promise.allSettled(
+                        voterEmails.map(async (email) => {
+                            const success = await sendElectionNotification(email, election);
+                            if (success) {
+                                console.log(`✅ Mail delivered to ${email}`);
+                            } else {
+                                console.log(`❌ Mail FAILED for ${email}`);
+                            }
+                            return success;
+                        })
+                    );
+                    
+                    const successful = results.filter(r => r.status === 'fulfilled' && r.value === true).length;
+                    const failed = results.length - successful;
+                    console.log(`📢 Email Dispatch Summary: ${successful} sent, ${failed} failed.`);
+                })();
+            } else {
+                console.log("ℹ️ No voters were found for this active election. Skipping email dispatch.");
+            }
+        }
+
         res.status(201).json(election)
     } catch (error) {
         res.status(500).json({ message: "Server error", error: error.message })
@@ -211,6 +242,35 @@ const activateElection = async (req, res) => {
         
         election.status = 'active';
         await election.save();
+
+        // Trigger emails in background (don't await to keep response fast)
+        if (election.allowedVoters && election.allowedVoters.length > 0) {
+            const voterEmails = election.allowedVoters.map(v => v.email);
+            console.log(`🚀 Starting background email dispatch for ${voterEmails.length} voters...`);
+            console.log(`Target emails: ${voterEmails.join(', ')}`);
+            
+            // Using a simple async block to prevent blocking the controller response
+            (async () => {
+                const results = await Promise.allSettled(
+                    voterEmails.map(async (email) => {
+                        const success = await sendElectionNotification(email, election);
+                        if (success) {
+                            console.log(`✅ Mail delivered to ${email}`);
+                        } else {
+                            console.log(`❌ Mail FAILED for ${email}`);
+                        }
+                        return success;
+                    })
+                );
+                
+                const successful = results.filter(r => r.status === 'fulfilled' && r.value === true).length;
+                const failed = results.length - successful;
+                console.log(`📢 Email Dispatch Summary: ${successful} sent, ${failed} failed.`);
+            })();
+        } else {
+            console.log("ℹ️ No voters were found for this election. Skipping email dispatch.");
+        }
+
         res.status(200).json({ message: 'Election Activated', election });
     } catch (error) {
         res.status(500).json({ message: 'Server Error', error: error.message });
