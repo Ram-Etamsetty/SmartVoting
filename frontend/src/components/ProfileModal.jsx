@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useAuth } from "../Context/AuthContext";
 import { useToast } from "../Context/ToastContext";
 import { useNavigate } from "react-router-dom";
+import API_ENDPOINTS from "../config/api";
 import { ButtonSpinner } from "./Spinners";
 
 const ProfileModal = ({ isOpen, onClose, user }) => {
@@ -35,7 +36,7 @@ const ProfileModal = ({ isOpen, onClose, user }) => {
     setLoading(true);
     try {
       const res = await fetch(
-        "http://localhost:4000/api/auth/change-password",
+        API_ENDPOINTS.AUTH_CHANGE_PASSWORD,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

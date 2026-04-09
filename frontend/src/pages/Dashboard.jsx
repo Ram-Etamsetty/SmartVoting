@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../Context/AuthContext";
 import { useToast } from "../Context/ToastContext";
+import API_ENDPOINTS from "../config/api";
 import { ButtonSpinner, SkeletonLoader } from "../components/Spinners";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
@@ -130,7 +131,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchElections = async () => {
       try {
-        const res = await fetch("http://localhost:4000/api/elections", {
+        const res = await fetch(API_ENDPOINTS.ELECTIONS_GET_ALL, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
@@ -154,7 +155,7 @@ const Dashboard = () => {
     if (!electionToDelete) return;
     setDeleting(true);
     try {
-      const res = await fetch(`http://localhost:4000/api/elections/${electionToDelete._id}`, {
+      const res = await fetch(API_ENDPOINTS.ELECTIONS_DELETE(electionToDelete._id), {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -194,7 +195,7 @@ const Dashboard = () => {
     if (!electionToActivate) return;
     setActivating(true);
     try {
-      const res = await fetch(`http://localhost:4000/api/elections/${electionToActivate._id}/activate`, {
+      const res = await fetch(API_ENDPOINTS.ELECTIONS_ACTIVATE(electionToActivate._id), {
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` },
       });

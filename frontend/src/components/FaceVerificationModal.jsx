@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import * as faceapi from "face-api.js";
 import { useAuth } from "../Context/AuthContext";
 import { useToast } from "../Context/ToastContext";
+import API_ENDPOINTS from "../config/api";
 import { ButtonSpinner } from "./Spinners";
 
 const FaceVerificationModal = ({ isOpen, onClose, onSuccess }) => {
@@ -112,7 +113,7 @@ const FaceVerificationModal = ({ isOpen, onClose, onSuccess }) => {
       const faceDescriptor = Array.from(detection.descriptor);
 
       setVerifying(true);
-      const res = await fetch("http://localhost:4000/api/auth/verify-face", {
+      const res = await fetch(API_ENDPOINTS.AUTH_VERIFY_FACE, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -121,8 +122,17 @@ const FaceVerificationModal = ({ isOpen, onClose, onSuccess }) => {
         body: JSON.stringify({ faceDescriptor }),
       });
 
-      const data = await res.json();
       setVerifying(false);
+
+      // Handle non-JSON responses
+      let data;
+      try {
+        data = await res.json();
+      } catch (parseError) {
+        console.error("JSON Parse Error:", parseError);
+        setFaceError("Server error: Invalid response from server.");
+        return;
+      }
 
       if (res.ok && data.success) {
         success("Identity verified successfully!");

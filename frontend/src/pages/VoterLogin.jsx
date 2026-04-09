@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../Context/AuthContext";
 import { useToast } from "../Context/ToastContext";
+import API_ENDPOINTS from "../config/api";
 import { ButtonSpinner } from "../components/Spinners";
 
 const VoterLogin = () => {
@@ -19,7 +20,7 @@ const VoterLogin = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:4000/api/auth/login", {
+      const res = await fetch(API_ENDPOINTS.AUTH_LOGIN, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...form, role: "voter" }),

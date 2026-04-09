@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import API_ENDPOINTS from "../config/api";
 
 const OTPModal = ({ email, onVerify, onClose, isOpen }) => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -69,7 +70,7 @@ const OTPModal = ({ email, onVerify, onClose, isOpen }) => {
 
     try {
       const response = await fetch(
-        "http://localhost:4000/api/auth/verify-otp",
+        API_ENDPOINTS.AUTH_VERIFY_OTP,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -100,7 +101,7 @@ const OTPModal = ({ email, onVerify, onClose, isOpen }) => {
 
     try {
       const response = await fetch(
-        "http://localhost:4000/api/auth/resend-otp",
+        API_ENDPOINTS.AUTH_REQUEST_OTP,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

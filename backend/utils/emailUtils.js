@@ -69,16 +69,16 @@ const sendOTPEmail = async (email, otp) => {
 // Send Election Notification email
 const sendElectionNotification = async (voterEmail, election) => {
   const { title, description, startDate, endDate } = election;
-  
+
   const formatDate = (date) => {
-    return new Date(date).toLocaleString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      timeZoneName: 'short'
+    return new Date(date).toLocaleString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZoneName: "short",
     });
   };
 
@@ -98,7 +98,7 @@ const sendElectionNotification = async (voterEmail, election) => {
           
           <div style="background-color: #F3F7FE; padding: 20px; border-left: 4px solid #00263A; border-radius: 6px; margin: 25px 0;">
             <h2 style="color: #00263A; margin-top: 0; font-size: 20px; font-weight: 700;">${title}</h2>
-            ${description ? `<p style="font-style: italic; color: #555; font-size: 15px; margin-bottom: 20px;">${description}</p>` : ''}
+            ${description ? `<p style="font-style: italic; color: #555; font-size: 15px; margin-bottom: 20px;">${description}</p>` : ""}
             
             <table style="width: 100%; border-collapse: collapse; background-color: #ffffff; border-radius: 8px; overflow: hidden;">
               <tr>
@@ -134,7 +134,10 @@ const sendElectionNotification = async (voterEmail, election) => {
     await transporter.sendMail(mailOptions);
     return true;
   } catch (error) {
-    console.error(`FAILED to send notification to ${voterEmail}:`, error.message);
+    console.error(
+      `FAILED to send notification to ${voterEmail}:`,
+      error.message,
+    );
     return false;
   }
 };

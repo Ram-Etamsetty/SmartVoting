@@ -184,7 +184,7 @@ const verifyOTP = async (req, res) => {
     await user.save();
 
     // Generate JWT token
-    const token = jwt.sign({ id: user._id, email: user.email }, "secret123", {
+    const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
 
@@ -245,7 +245,7 @@ const loginUser = async (req, res) => {
 
     const token = jwt.sign(
       { id: userAvailable._id, email: userAvailable.email },
-      "secret123",
+      process.env.JWT_SECRET,
       {
         expiresIn: "7d",
       },

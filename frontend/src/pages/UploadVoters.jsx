@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../Context/AuthContext';
+import API_ENDPOINTS from '../config/api';
 import * as XLSX from 'xlsx';
 import { ButtonSpinner } from '../components/Spinners';
 
@@ -110,8 +111,8 @@ const UploadVoters = () => {
         try {
             const isEdit = !!electionData._id;
             const url = isEdit 
-                ? `http://localhost:4000/api/elections/${electionData._id}` 
-                : 'http://localhost:4000/api/elections';
+                ? API_ENDPOINTS.ELECTIONS_UPDATE(electionData._id) 
+                : API_ENDPOINTS.ELECTIONS_CREATE;
                 
             const res = await fetch(url, {
                 method: isEdit ? 'PUT' : 'POST',

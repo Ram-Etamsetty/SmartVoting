@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../Context/AuthContext";
 import { useToast } from "../Context/ToastContext";
 import { ButtonSpinner } from "../components/Spinners";
+import API_ENDPOINTS from "../config/api";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:4000/api/auth/login", {
+      const res = await fetch(API_ENDPOINTS.AUTH_LOGIN, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),

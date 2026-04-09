@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../Context/AuthContext';
 import { useToast } from '../Context/ToastContext';
+import API_ENDPOINTS from '../config/api';
 import NavBar from '../components/NavBar';
 import ProfileModal from '../components/ProfileModal';
 import Footer from '../components/Footer';
@@ -18,7 +19,7 @@ const VoterDashboard = () => {
     useEffect(() => {
         const fetchVoterElections = async () => {
             try {
-                const res = await fetch('http://localhost:4000/api/elections/voter', {
+                const res = await fetch(API_ENDPOINTS.VOTER_ELECTIONS_GET_ALL, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 const data = await res.json();

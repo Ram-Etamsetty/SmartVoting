@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../Context/AuthContext";
 import { useToast } from "../Context/ToastContext";
+import API_ENDPOINTS from "../config/api";
 import OTPModal from "../components/OTPModal";
 import { ButtonSpinner } from "../components/Spinners";
 import * as faceapi from "face-api.js";
@@ -176,7 +177,7 @@ const GetStarted = () => {
       return;
     }
     try {
-      const res = await fetch("http://localhost:4000/api/auth/register", {
+      const res = await fetch(API_ENDPOINTS.AUTH_REGISTER, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

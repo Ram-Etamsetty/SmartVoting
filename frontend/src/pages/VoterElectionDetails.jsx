@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../Context/AuthContext";
 import { useToast } from "../Context/ToastContext";
+import API_ENDPOINTS from "../config/api";
 import NavBar from "../components/NavBar";
 import ProfileModal from "../components/ProfileModal";
 import FaceVerificationModal from "../components/FaceVerificationModal";
@@ -28,7 +29,7 @@ const VoterElectionDetails = () => {
     const fetchVoterElection = async () => {
       try {
         const res = await fetch(
-          `http://localhost:4000/api/elections/voter/${id}`,
+          API_ENDPOINTS.VOTER_ELECTIONS_GET_BY_ID(id),
           {
             headers: { Authorization: `Bearer ${token}` },
           },
@@ -71,7 +72,7 @@ const VoterElectionDetails = () => {
     setSubmitting(true);
     try {
       const res = await fetch(
-        `http://localhost:4000/api/elections/${id}/vote`,
+        API_ENDPOINTS.VOTE_CAST(id),
         {
           method: "POST",
           headers: {

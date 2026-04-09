@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../Context/AuthContext';
 import { useToast } from '../Context/ToastContext';
+import API_ENDPOINTS from '../config/api';
 import NavBar from '../components/NavBar';
 import ProfileModal from '../components/ProfileModal';
 import Footer from '../components/Footer';
@@ -51,7 +52,7 @@ const ElectionDetails = () => {
         if (showLogs && ballots.length === 0) {
             const fetchBallots = async () => {
                 try {
-                    const res = await fetch(`http://localhost:4000/api/elections/${id}/ballots`, {
+                    const res = await fetch(API_ENDPOINTS.ELECTIONS_GET_BALLOTS(id), {
                         headers: { Authorization: `Bearer ${token}` }
                     });
                     if (res.ok) {
@@ -68,7 +69,7 @@ const ElectionDetails = () => {
     useEffect(() => {
         const fetchElectionDetails = async () => {
             try {
-                const res = await fetch(`http://localhost:4000/api/elections/${id}`, {
+                const res = await fetch(API_ENDPOINTS.ELECTIONS_GET_BY_ID(id), {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 
