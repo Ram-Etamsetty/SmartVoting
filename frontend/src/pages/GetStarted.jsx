@@ -340,23 +340,37 @@ const GetStarted = () => {
           <div className="fixed inset-0 flex items-center justify-center z-[100] backdrop-blur-sm bg-black/40 px-4">
             <div className="bg-white p-7 rounded-2xl shadow-xl flex flex-col items-center gap-5 w-full max-w-md animate-in fade-in zoom-in duration-200">
               <div className="flex flex-col items-center gap-1 w-full mt-2">
-                <h2 className="text-[24px] font-semibold text-[#00263A] inter-font">Facial Registration</h2>
+                <h2 className="text-[24px] font-semibold text-[#00263A] inter-font">
+                  Facial Registration
+                </h2>
                 <p className="text-gray-500 text-center text-[14px]">
-                  Please look straight into the camera in a well-lit environment.
+                  Please look straight into the camera in a well-lit
+                  environment.
                 </p>
               </div>
-              
+
               {/* Camera / Preview */}
               <div className="w-full h-[320px] bg-[#F8F9FA] rounded-xl overflow-hidden flex items-center justify-center border border-gray-200 shadow-inner">
                 {!modelsLoaded && !capturedImage ? (
                   <div className="flex flex-col items-center gap-3">
-                     <ButtonSpinner size="md" />
-                     <p className="text-gray-400 text-sm font-medium">Loading AI models...</p>
+                    <ButtonSpinner size="md" />
+                    <p className="text-gray-400 text-sm font-medium">
+                      Loading AI models...
+                    </p>
                   </div>
                 ) : !capturedImage ? (
-                  <video ref={videoRef} autoPlay muted className="w-full h-full object-cover scale-x-[-1]" />
+                  <video
+                    ref={videoRef}
+                    autoPlay
+                    muted
+                    className="w-full h-full object-cover scale-x-[-1]"
+                  />
                 ) : (
-                  <img src={capturedImage} alt="captured" className="w-full h-full object-cover scale-x-[-1]" />
+                  <img
+                    src={capturedImage}
+                    alt="captured"
+                    className="w-full h-full object-cover scale-x-[-1]"
+                  />
                 )}
               </div>
 
@@ -367,7 +381,9 @@ const GetStarted = () => {
                   onClick={takePhoto}
                   disabled={!modelsLoaded}
                   className={`w-full py-3 rounded-lg font-semibold text-[15px] inter-font transition shadow-sm ${
-                    !modelsLoaded ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-[#00263A] text-white hover:bg-[#001a28]"
+                    !modelsLoaded
+                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      : "bg-[#00263A] text-white hover:bg-[#001a28]"
                   }`}
                 >
                   {modelsLoaded ? "Capture Photo" : "Please Wait..."}
@@ -404,14 +420,14 @@ const GetStarted = () => {
                 </p>
               )}
 
-              <button 
+              <button
                 type="button"
                 onClick={() => {
                   setShowCamera(false);
                   stopVideo();
                   setCapturedImage(null);
                   setFaceError("");
-                }} 
+                }}
                 disabled={detecting}
                 className="text-gray-400 text-sm hover:text-gray-700 underline underline-offset-2 mb-1 cursor-pointer transition disabled:opacity-50"
               >

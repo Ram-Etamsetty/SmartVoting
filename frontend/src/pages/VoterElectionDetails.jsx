@@ -28,12 +28,9 @@ const VoterElectionDetails = () => {
   useEffect(() => {
     const fetchVoterElection = async () => {
       try {
-        const res = await fetch(
-          API_ENDPOINTS.VOTER_ELECTIONS_GET_BY_ID(id),
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
+        const res = await fetch(API_ENDPOINTS.VOTER_ELECTIONS_GET_BY_ID(id), {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const data = await res.json();
 
         if (!res.ok) throw new Error(data.message || "Failed to fetch ballot");
@@ -71,17 +68,14 @@ const VoterElectionDetails = () => {
     setFaceVerificationOpen(false);
     setSubmitting(true);
     try {
-      const res = await fetch(
-        API_ENDPOINTS.VOTE_CAST(id),
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ candidateId: selectedCandidate }),
+      const res = await fetch(API_ENDPOINTS.VOTE_CAST(id), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-      );
+        body: JSON.stringify({ candidateId: selectedCandidate }),
+      });
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to submit ballot");
@@ -112,7 +106,7 @@ const VoterElectionDetails = () => {
   const isActive = election.status === "active";
   const hasVoted = election.userHasVoted;
   const isClosed = election.status === "closed";
-  
+
   const now = new Date();
   const startDate = new Date(election.startDate);
   const isUpcoming = isActive && now < startDate;
@@ -128,7 +122,7 @@ const VoterElectionDetails = () => {
     );
     if (candidatesSorted.length > 0 && candidatesSorted[0].voteCount > 0) {
       const maxVotes = candidatesSorted[0].voteCount;
-      winners = candidatesSorted.filter(c => c.voteCount === maxVotes);
+      winners = candidatesSorted.filter((c) => c.voteCount === maxVotes);
       isDraw = winners.length > 1;
     }
   }
@@ -161,7 +155,8 @@ const VoterElectionDetails = () => {
         {isUpcoming && (
           <div className="mb-6 w-full p-4 rounded-lg bg-blue-50 border border-blue-200 text-blue-700 font-semibold flex items-center gap-3">
             <span className="text-xl">⏳</span>
-            This election will open for voting on {startDate.toLocaleString()}. Check back later!
+            This election will open for voting on {startDate.toLocaleString()}.
+            Check back later!
           </div>
         )}
 
@@ -238,16 +233,22 @@ const VoterElectionDetails = () => {
               </h2>
 
               {winners.length > 0 && (
-                <div className={`mb-8 p-6 border rounded-xl flex items-center justify-between ${isDraw ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border-indigo-200' : 'bg-gradient-to-r from-yellow-50 to-orange-50 border-orange-200'}`}>
+                <div
+                  className={`mb-8 p-6 border rounded-xl flex items-center justify-between ${isDraw ? "bg-gradient-to-r from-blue-50 to-indigo-50 border-indigo-200" : "bg-gradient-to-r from-yellow-50 to-orange-50 border-orange-200"}`}
+                >
                   <div className="flex flex-col">
-                    <span className={`text-xs font-bold uppercase tracking-widest mb-1 ${isDraw ? 'text-indigo-500' : 'text-orange-500'}`}>
-                      {isDraw ? 'Declared Draw (Tie)' : 'Declared Winner'}
+                    <span
+                      className={`text-xs font-bold uppercase tracking-widest mb-1 ${isDraw ? "text-indigo-500" : "text-orange-500"}`}
+                    >
+                      {isDraw ? "Declared Draw (Tie)" : "Declared Winner"}
                     </span>
                     <span className="text-2xl font-black text-[#00263A]">
-                      {winners.map(w => w.name).join(', ')}
+                      {winners.map((w) => w.name).join(", ")}
                     </span>
                   </div>
-                  <span className="text-5xl drop-shadow-sm">{isDraw ? '🤝' : '👑'}</span>
+                  <span className="text-5xl drop-shadow-sm">
+                    {isDraw ? "🤝" : "👑"}
+                  </span>
                 </div>
               )}
 

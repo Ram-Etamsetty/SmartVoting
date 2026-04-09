@@ -74,34 +74,34 @@ const ElectionCard = ({ election, onDelete, onView, onActivate, onEdit }) => {
       <div className="flex items-center gap-4 sm:gap-5 w-full sm:w-auto shrink-0 border-t sm:border-t-0 pt-3 sm:pt-0 mt-1 sm:mt-0 border-gray-100 justify-between sm:justify-end">
         <StatusBadge status={election.status} />
         <div className="flex items-center gap-4">
-            {election.status === "draft" && (
-              <button
-                onClick={() => onEdit(election)}
-                className="inter-font text-sm text-yellow-600 hover:text-yellow-700 cursor-pointer transition font-medium"
-              >
-                Edit
-              </button>
-            )}
-            {election.status === "draft" && (
-              <button
-                onClick={() => onActivate(election)}
-                className="inter-font text-sm text-green-600 hover:text-green-700 cursor-pointer transition font-medium"
-              >
-                Activate
-              </button>
-            )}
+          {election.status === "draft" && (
             <button
-              onClick={() => onView(election._id)}
-              className="inter-font text-sm text-blue-600 hover:text-blue-700 cursor-pointer transition font-medium"
+              onClick={() => onEdit(election)}
+              className="inter-font text-sm text-yellow-600 hover:text-yellow-700 cursor-pointer transition font-medium"
             >
-              View
+              Edit
             </button>
+          )}
+          {election.status === "draft" && (
             <button
-              onClick={handleDelete}
-              className="inter-font text-sm text-red-600 hover:text-red-700 cursor-pointer transition font-medium disabled:opacity-50"
+              onClick={() => onActivate(election)}
+              className="inter-font text-sm text-green-600 hover:text-green-700 cursor-pointer transition font-medium"
             >
-              Delete
+              Activate
             </button>
+          )}
+          <button
+            onClick={() => onView(election._id)}
+            className="inter-font text-sm text-blue-600 hover:text-blue-700 cursor-pointer transition font-medium"
+          >
+            View
+          </button>
+          <button
+            onClick={handleDelete}
+            className="inter-font text-sm text-red-600 hover:text-red-700 cursor-pointer transition font-medium disabled:opacity-50"
+          >
+            Delete
+          </button>
         </div>
       </div>
     </div>
@@ -113,7 +113,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [verifyModalOpen, setVerifyModalOpen] = useState(false);
-  
+
   // Activation Modal State
   const [activateModalOpen, setActivateModalOpen] = useState(false);
   const [electionToActivate, setElectionToActivate] = useState(null);
@@ -155,12 +155,17 @@ const Dashboard = () => {
     if (!electionToDelete) return;
     setDeleting(true);
     try {
-      const res = await fetch(API_ENDPOINTS.ELECTIONS_DELETE(electionToDelete._id), {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        API_ENDPOINTS.ELECTIONS_DELETE(electionToDelete._id),
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       if (!res.ok) throw new Error("Delete failed");
-      setElections((prev) => prev.filter((e) => e._id !== electionToDelete._id));
+      setElections((prev) =>
+        prev.filter((e) => e._id !== electionToDelete._id),
+      );
       success("Election deleted successfully");
       setDeleteModalOpen(false);
     } catch (err) {
@@ -177,7 +182,7 @@ const Dashboard = () => {
   };
 
   const handleEdit = (election) => {
-    navigate('/create-election', { state: { prevData: election } });
+    navigate("/create-election", { state: { prevData: election } });
   };
 
   const handleLogout = () => {
@@ -195,13 +200,18 @@ const Dashboard = () => {
     if (!electionToActivate) return;
     setActivating(true);
     try {
-      const res = await fetch(API_ENDPOINTS.ELECTIONS_ACTIVATE(electionToActivate._id), {
-        method: "PUT",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        API_ENDPOINTS.ELECTIONS_ACTIVATE(electionToActivate._id),
+        {
+          method: "PUT",
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       if (!res.ok) throw new Error("Failed to activate");
-      setElections((prev) => 
-        prev.map(e => e._id === electionToActivate._id ? { ...e, status: "active" } : e)
+      setElections((prev) =>
+        prev.map((e) =>
+          e._id === electionToActivate._id ? { ...e, status: "active" } : e,
+        ),
       );
       success("Election activated successfully!");
       setActivateModalOpen(false);

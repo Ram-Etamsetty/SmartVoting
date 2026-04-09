@@ -9,7 +9,11 @@ const {
   verifyFace,
 } = require("../Controllers/authController");
 const { protect } = require("../Middleware/AuthMiddleWare");
-const { validateRegister, validateLogin, validateOTP } = require("../Middleware/validationMiddleware");
+const {
+  validateRegister,
+  validateLogin,
+  validateOTP,
+} = require("../Middleware/validationMiddleware");
 
 router.post("/register", validateRegister, register);
 router.post("/verify-otp", validateOTP, verifyOTP);

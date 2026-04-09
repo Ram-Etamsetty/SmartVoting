@@ -49,7 +49,10 @@ const Login = () => {
           </h1>
           <p className="text-[16px] text-[#262D3A] mb-6.25">
             To Cast Your Vote, Visit{" "}
-            <a className="text-orange-400 underline text-sm font-bold" href="/voter-login">
+            <a
+              className="text-orange-400 underline text-sm font-bold"
+              href="/voter-login"
+            >
               Voting Page
             </a>
           </p>

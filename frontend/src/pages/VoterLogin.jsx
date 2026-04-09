@@ -49,7 +49,10 @@ const VoterLogin = () => {
           </h1>
           <p className="text-[16px] text-[#262D3A] mb-6.25">
             To create an election instead, Visit{" "}
-            <a className="text-orange-400 underline text-sm font-bold" href="/login">
+            <a
+              className="text-orange-400 underline text-sm font-bold"
+              href="/login"
+            >
               Administrator Platform
             </a>
           </p>

@@ -69,14 +69,11 @@ const OTPModal = ({ email, onVerify, onClose, isOpen }) => {
     setError("");
 
     try {
-      const response = await fetch(
-        API_ENDPOINTS.AUTH_VERIFY_OTP,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, otp: otpCode }),
-        },
-      );
+      const response = await fetch(API_ENDPOINTS.AUTH_VERIFY_OTP, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, otp: otpCode }),
+      });
 
       const data = await response.json();
 
@@ -100,14 +97,11 @@ const OTPModal = ({ email, onVerify, onClose, isOpen }) => {
     setError("");
 
     try {
-      const response = await fetch(
-        API_ENDPOINTS.AUTH_REQUEST_OTP,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email }),
-        },
-      );
+      const response = await fetch(API_ENDPOINTS.AUTH_REQUEST_OTP, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
 
       const data = await response.json();
 

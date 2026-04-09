@@ -35,18 +35,15 @@ const ProfileModal = ({ isOpen, onClose, user }) => {
 
     setLoading(true);
     try {
-      const res = await fetch(
-        API_ENDPOINTS.AUTH_CHANGE_PASSWORD,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: user?.email,
-            oldPassword,
-            newPassword,
-          }),
-        },
-      );
+      const res = await fetch(API_ENDPOINTS.AUTH_CHANGE_PASSWORD, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: user?.email,
+          oldPassword,
+          newPassword,
+        }),
+      });
 
       const data = await res.json();
 
@@ -81,7 +78,9 @@ const ProfileModal = ({ isOpen, onClose, user }) => {
       <div className="bg-white rounded-lg shadow-2xl w-full max-w-md max-h-[85vh] overflow-y-auto border border-gray-200">
         {/* Header */}
         <div className="px-6 pt-6 pb-2 flex items-center justify-between">
-          <h2 className="inter-font text-[28px] font-semibold text-[#262D34]">Profile</h2>
+          <h2 className="inter-font text-[28px] font-semibold text-[#262D34]">
+            Profile
+          </h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-black transition text-2xl font-bold font-sans"
@@ -105,7 +104,9 @@ const ProfileModal = ({ isOpen, onClose, user }) => {
               <p className="inter-font text-[14px] text-[#262D3A] font-semibold mb-1">
                 EMAIL
               </p>
-              <p className="inter-font text-[16px] text-[#00263A]">{user?.email}</p>
+              <p className="inter-font text-[16px] text-[#00263A]">
+                {user?.email}
+              </p>
             </div>
             <div className="border-t border-[#E0E7FF] pt-3">
               <p className="inter-font text-[14px] text-[#262D3A] font-semibold mb-1">
@@ -119,7 +120,7 @@ const ProfileModal = ({ isOpen, onClose, user }) => {
 
           {/* Change Password Section */}
           {!showPasswordChange ? (
-              <button
+            <button
               onClick={() => setShowPasswordChange(true)}
               className="w-full px-7 py-3 text-white font-semibold text-md inter-font rounded flex items-center justify-center gap-2 bg-[#00263A] hover:bg-[#001a28] transition"
             >
