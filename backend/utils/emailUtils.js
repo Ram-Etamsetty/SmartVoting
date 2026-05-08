@@ -16,6 +16,7 @@ const transporter = nodemailer.createTransport({
     rejectUnauthorized: false,
     minVersion: "TLSv1.2",
   },
+  family: 4, // Force IPv4 to avoid ENETUNREACH errors
 });
 
 // Test connection on startup
