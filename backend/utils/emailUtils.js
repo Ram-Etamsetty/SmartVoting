@@ -1,25 +1,7 @@
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Create a singleton transporter instance with connection pooling
-const transporter = nodemailer.createTransport({
-  host: "smtp.resend.com",
-  port: 587,
-  secure: false, // true for 465, false for other ports
-  auth: {
-    user: "resend",
-    pass: process.env.RESEND_API_KEY,
-  },
-});
-
-// Test connection on startup
-console.log("📧 Checking email configuration...");
-transporter.verify((error, success) => {
-  if (error) {
-    console.error("❌ Email setup failed:", error.message);
-  } else {
-    console.log("✅ Email transporter ready to send");
-  }
-});
+console.log("📧 Resend HTTP API ready for email sending");
 
 // Generate 6-digit OTP
 const generateOTP = () => {
@@ -30,7 +12,7 @@ const generateOTP = () => {
 const sendOTPEmail = async (email, otp) => {
   console.log(`\n📧 SENDING OTP EMAIL to ${email}`);
 
-  const mailOptions = {
+  const mailData = {
     from: `"Voter Management" <${process.env.EMAIL_FROM}>`,
     to: email,
     subject: "Email Verification - OTP",
@@ -50,8 +32,12 @@ const sendOTPEmail = async (email, otp) => {
   };
 
   try {
-    const info = await transporter.sendMail(mailOptions);
-    console.log(`OTP EMAIL SENT - MessageID: ${info.messageId}`);
+    const { data, error } = await resend.emails.send(mailData);
+    if (error) {
+      console.error(`EMAIL FAILED:`, error.message || error);
+      return false;
+    }
+    console.log(`OTP EMAIL SENT - ID: ${data.id}`);
     return true;
   } catch (error) {
     console.error(`EMAIL FAILED:`, error.message);
