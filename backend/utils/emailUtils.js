@@ -2,21 +2,13 @@ const nodemailer = require("nodemailer");
 
 // Create a singleton transporter instance with connection pooling
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
+  host: "smtp.resend.com",
   port: 587,
   secure: false, // true for 465, false for other ports
-  pool: true, // Use pool for multiple emails
-  maxConnections: 5,
-  maxMessages: 100,
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD,
+    user: "resend",
+    pass: process.env.RESEND_API_KEY,
   },
-  tls: {
-    rejectUnauthorized: false,
-    minVersion: "TLSv1.2",
-  },
-  family: 4, // Force IPv4 to avoid ENETUNREACH errors
 });
 
 // Test connection on startup
@@ -39,7 +31,7 @@ const sendOTPEmail = async (email, otp) => {
   console.log(`\n📧 SENDING OTP EMAIL to ${email}`);
 
   const mailOptions = {
-    from: `"Voter Management" <${process.env.EMAIL_USER}>`,
+    from: `"Voter Management" <${process.env.EMAIL_FROM}>`,
     to: email,
     subject: "Email Verification - OTP",
     html: `
